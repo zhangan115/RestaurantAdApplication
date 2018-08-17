@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">RestaurantAdApplication</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="image_des_call_background">服务背景</string>
+    <string name="call">服务</string>
 </resources>
