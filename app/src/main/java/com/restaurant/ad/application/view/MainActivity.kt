@@ -1,4 +1,4 @@
-package com.restaurant.ad.application
+package com.restaurant.ad.application.view
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -12,15 +12,10 @@ import android.support.v4.view.ViewPager
 import android.support.v7.app.AppCompatActivity
 import android.view.Window
 import android.view.WindowManager
+import com.restaurant.ad.application.R
 import kotlinx.android.synthetic.main.activity_main.*
 
-class MainActivity : AppCompatActivity(), ContextFragment.OnFragmentInteractionListener {
-
-    override fun onFragmentInteraction() {
-        currentPosition = noScrollViewPager.currentItem
-        ++currentPosition
-        noScrollViewPager.setCurrentItem(currentPosition, true)
-    }
+class MainActivity : AppCompatActivity() {
 
     private val data = ArrayList<String>()
     private val broadcastReceiver = NextBroadcastReceive()
@@ -38,9 +33,14 @@ class MainActivity : AppCompatActivity(), ContextFragment.OnFragmentInteractionL
         noScrollViewPager.layoutParams.height = height
         noScrollViewPager.adapter = ViewPagerAdapter(supportFragmentManager)
         noScrollViewPager.addOnPageChangeListener(MyPageChangeListener())
+        noScrollViewPager.offscreenPageLimit = 3
         noScrollViewPager.setCurrentItem(1, false)
         val intentFilter = IntentFilter("next")
         registerReceiver(broadcastReceiver, intentFilter)
+
+        llTime.setOnClickListener {
+            startActivity(Intent(this, LoginSettingActivity::class.java))
+        }
     }
 
     override fun onDestroy() {
@@ -56,11 +56,11 @@ class MainActivity : AppCompatActivity(), ContextFragment.OnFragmentInteractionL
 
         override fun getItem(position: Int): Fragment {
             return if (position == 0) {
-                ContextFragment.newInstance(data[data.size - 1], true, 15L)
+                ContextFragment.newInstance(true)
             } else if (position > 0 && position <= data.size) {
-                ContextFragment.newInstance(data[position - 1], true, 15L)
+                ContextFragment.newInstance(data[position - 1], false, 5000L)
             } else {
-                ContextFragment.newInstance(data[0], true, 15L)
+                ContextFragment.newInstance(true)
             }
         }
 
@@ -73,10 +73,11 @@ class MainActivity : AppCompatActivity(), ContextFragment.OnFragmentInteractionL
 
         override fun onReceive(contenxt: Context?, intent: Intent?) {
             if (intent != null) {
-                noScrollViewPager.setCurrentItem(intent.getIntExtra("position", 0), true)
+                currentPosition = noScrollViewPager.currentItem
+                ++currentPosition
+                noScrollViewPager.setCurrentItem(currentPosition, true)
             }
         }
-
     }
 
     private inner class MyPageChangeListener : ViewPager.OnPageChangeListener {
@@ -98,6 +99,5 @@ class MainActivity : AppCompatActivity(), ContextFragment.OnFragmentInteractionL
         override fun onPageSelected(position: Int) {
             mPosition = position
         }
-
     }
 }

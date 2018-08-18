@@ -4,12 +4,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".MainActivity">
+    tools:context=".view.MainActivity">
 
     <com.restaurant.ad.application.widget.NoScrollViewPager
         android:id="@+id/noScrollViewPager"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="576dp"
         android:background="@color/colorPrimary"
         android:scrollbars="none" />
 
@@ -35,6 +35,34 @@
             android:text="@string/call"
             android:textColor="@android:color/white"
             android:textSize="20sp" />
+
+        <LinearLayout
+            android:id="@+id/llTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginBottom="40px"
+            android:gravity="right"
+            android:orientation="vertical"
+            android:paddingRight="46dp">
+
+            <TextView
+                android:id="@+id/tvTimeMin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="21:28"
+                android:textSize="24sp" />
+
+            <TextView
+                android:id="@+id/tvTimeYear"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:lines="1"
+                android:text="2018年8月11日星期六"
+                android:textSize="18sp" />
+        </LinearLayout>
 
     </RelativeLayout>
 
