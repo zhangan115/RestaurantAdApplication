@@ -20,9 +20,13 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".view.LoginSettingActivity"
+            android:name=".view.LoginActivity"
             android:screenOrientation="landscape"
             android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".view.RestaurantConfigActivity"
+            android:label="@string/title_activity_main2"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

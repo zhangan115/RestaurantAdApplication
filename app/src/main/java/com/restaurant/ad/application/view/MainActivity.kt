@@ -39,7 +39,7 @@ class MainActivity : AppCompatActivity() {
         registerReceiver(broadcastReceiver, intentFilter)
 
         llTime.setOnClickListener {
-            startActivity(Intent(this, LoginSettingActivity::class.java))
+            startActivity(Intent(this, LoginActivity::class.java))
         }
     }
 
