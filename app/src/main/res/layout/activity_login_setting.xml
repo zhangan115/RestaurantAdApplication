@@ -11,12 +11,13 @@
         android:layout_height="match_parent"
         android:contentDescription="@string/login_setting_background" />
 
-    <ImageButton
+    <ImageView
         android:id="@+id/back_btn"
-        android:layout_width="56dp"
-        android:layout_height="56dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginLeft="50dp"
-        android:layout_marginTop="44dp" />
+        android:layout_marginTop="44dp"
+        android:src="@drawable/btn_back" />
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -112,15 +113,16 @@
                         android:maxLength="15" />
                 </LinearLayout>
 
-                <Button
+                <TextView
                     android:id="@+id/btnLogin"
                     android:layout_width="260dp"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="42dp"
                     android:layout_marginTop="35dp"
+                    android:background="@drawable/btn_login"
                     android:gravity="center"
-                    android:paddingBottom="18dp"
-                    android:paddingTop="18dp"
+                    android:paddingBottom="10dp"
+                    android:paddingTop="10dp"
                     android:text="@string/login"
                     android:textColor="@android:color/white"
                     android:textSize="22sp" />
