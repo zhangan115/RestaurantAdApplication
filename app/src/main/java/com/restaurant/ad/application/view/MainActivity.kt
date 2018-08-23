@@ -26,9 +26,15 @@ class MainActivity : AppCompatActivity() {
         requestWindowFeature(Window.FEATURE_NO_TITLE)// 隐藏标题
         window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)// 设置全屏
         setContentView(R.layout.activity_main)
-        data.add("1")
-        data.add("2")
-        data.add("3")
+        data.add("http://qiniu-video5.vmoviercdn.com/5b7b7cae8348e.mp4")
+        data.add("http://qiniu-video5.vmoviercdn.com/5b7a3c0e8e5ba.mp4")
+        data.add("http://cs.vmovier.com/Uploads/cover/2017-02-23/58aec1f65a07f_cut.jpeg@607h_1080w_1e_1c.jpg")
+        data.add("http://qiniu-video3.vmoviercdn.com/5b6d535e14e32.mp4")
+        data.add("http://cs.vmovier.com/Uploads/cover/2017-02-23/58aebbf9c9d39_cut.jpeg@607h_1080w_1e_1c.jpg")
+        data.add("http://qiniu-video3.vmoviercdn.com/5b710c565d522.mp4")
+        data.add("http://cs.vmovier.com/Uploads/cover/2016-07-12/5784e8de070ec_cut.jpeg@607h_1080w_1e_1c.jpg")
+        data.add("http://qiniu-video5.vmoviercdn.com/5b63129a25b63.mp4")
+        data.add("https://cs.vmovier.com/Uploads/cover/2018-08-15/5b740b73d90ca_cut.jpeg")
         val height = resources.displayMetrics.widthPixels / 16 * 9
         noScrollViewPager.layoutParams.height = height
         noScrollViewPager.adapter = ViewPagerAdapter(supportFragmentManager)
@@ -58,7 +64,7 @@ class MainActivity : AppCompatActivity() {
             return if (position == 0) {
                 ContextFragment.newInstance(true)
             } else if (position > 0 && position <= data.size) {
-                ContextFragment.newInstance(data[position - 1], false, 5000L)
+                ContextFragment.newInstance(data[position - 1])
             } else {
                 ContextFragment.newInstance(true)
             }

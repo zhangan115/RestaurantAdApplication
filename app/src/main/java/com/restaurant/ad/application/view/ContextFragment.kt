@@ -12,6 +12,8 @@ import android.view.View
 import android.view.ViewGroup
 import com.restaurant.ad.application.BuildConfig
 import com.restaurant.ad.application.R
+import com.restaurant.ad.application.app.GlideApp
+import com.restaurant.ad.application.mode.VideoFileMode
 import kotlinx.android.synthetic.main.fragment_context.*
 import java.lang.ref.WeakReference
 
@@ -20,7 +22,7 @@ private const val ARG_PARAM2 = "param2"
 private const val ARG_PARAM3 = "param3"
 private const val ARG_PARAM4 = "param4"
 
-class ContextFragment : Fragment() {
+class ContextFragment : Fragment(), VideoFileMode.DownLoadHandle.DownLoadCallBack {
 
     //Fragment的View加载完毕的标记
     private var isViewCreated: Boolean = false
@@ -33,6 +35,7 @@ class ContextFragment : Fragment() {
     private var notLoad: Boolean = false//是否加载
     //倒计时控制handler
     private var controlHandler: Handler? = null
+    private var videoMode: VideoFileMode? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,8 +59,25 @@ class ContextFragment : Fragment() {
             controlHandler = ControlHandler(WeakReference(activity!!))
         }
         isViewCreated = true
-        tv_name.text = url
+        if (isVideo) {
+            image_view.visibility = View.GONE
+            video_view.visibility = View.VISIBLE
+            videoMode = VideoFileMode(url)
+            videoMode?.downLoadFile(this)
+            video_view.setVideoPath(url)
+        } else {
+            image_view.visibility = View.VISIBLE
+            video_view.visibility = View.GONE
+            GlideApp.with(this).load(url)
+                    .placeholder(R.drawable.shape_image_background)
+                    .into(image_view)
+        }
         lazyLoad()
+    }
+
+    override fun downSuccess() {
+        Log.d("za", "downLoad success")
+        video_view.setVideoPath(videoMode?.getUrlVideoLocal()?.absolutePath)
     }
 
     override fun setUserVisibleHint(isVisibleToUser: Boolean) {
@@ -83,11 +103,18 @@ class ContextFragment : Fragment() {
             return
         }
         if (BuildConfig.DEBUG)
-            Log.d("za", "===${url}播放视频或者展示图片===")
+            Log.d("za", "===$isVideo")
         if (isVideo) {
-            //todo 视频播放
+            val fileName = url?.substring(url?.lastIndexOf("/")!! + 1)
+            Log.d("za", "$fileName")
+            video_view.setOnPreparedListener {
+                it?.setVolume(0f, 0f)
+            }
+            video_view.setOnCompletionListener {
+                controlHandler?.sendEmptyMessage(1)//开始计时
+            }
+            video_view.start()
         } else {
-            //todo 加载图片
             controlHandler?.sendEmptyMessageDelayed(1, imageTime)//开始计时
         }
     }
@@ -124,8 +151,8 @@ class ContextFragment : Fragment() {
                 ContextFragment().apply {
                     arguments = Bundle().apply {
                         putString(ARG_PARAM1, url)
-                        putBoolean(ARG_PARAM2, false)
-                        putLong(ARG_PARAM3, 15)
+                        putBoolean(ARG_PARAM2, url.endsWith(".mp4"))
+                        putLong(ARG_PARAM3, 5000)
                     }
                 }
 

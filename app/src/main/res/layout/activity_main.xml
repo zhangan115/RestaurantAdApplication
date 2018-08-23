@@ -22,7 +22,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:contentDescription="@string/image_des_call_background"
-            android:scaleType="centerCrop" />
+            android:scaleType="centerCrop"
+            android:src="@drawable/app_home_bg" />
 
         <TextView
             android:id="@+id/tv_call"
@@ -30,7 +31,7 @@
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:layout_gravity="center"
-            android:background="@drawable/background_call_normal"
+            android:background="@drawable/call_background"
             android:gravity="center"
             android:text="@string/call"
             android:textColor="@android:color/white"
@@ -51,8 +52,9 @@
                 android:id="@+id/tvTimeMin"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="21:28"
-                android:textSize="24sp" />
+                android:textColor="#fff"
+                android:textSize="24sp"
+                tools:text="21:28" />
 
             <TextView
                 android:id="@+id/tvTimeYear"
@@ -60,8 +62,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:lines="1"
-                android:text="2018年8月11日星期六"
-                android:textSize="18sp" />
+                android:textColor="#fff"
+                android:textSize="18sp"
+                tools:text="2018年8月11日星期六" />
         </LinearLayout>
 
     </RelativeLayout>
