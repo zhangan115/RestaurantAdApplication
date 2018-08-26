@@ -1,10 +1,14 @@
 package com.restaurant.ad.application.view
 
+import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
+import android.os.CountDownTimer
+import android.os.Handler
+import android.os.Message
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentStatePagerAdapter
@@ -14,27 +18,40 @@ import android.view.Window
 import android.view.WindowManager
 import com.restaurant.ad.application.R
 import kotlinx.android.synthetic.main.activity_main.*
+import java.lang.ref.WeakReference
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
     private val data = ArrayList<String>()
     private val broadcastReceiver = NextBroadcastReceive()
     private var currentPosition: Int = 1
+    private var timeHandler: TimeHandler? = null
+    private val timeBr: TimeBroadcastReceive = TimeBroadcastReceive()
 
+    private var currentTime = 0L
+    private var openSetting = 0
+    private var isCalling = false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         requestWindowFeature(Window.FEATURE_NO_TITLE)// 隐藏标题
         window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)// 设置全屏
         setContentView(R.layout.activity_main)
-        data.add("http://qiniu-video5.vmoviercdn.com/5b7b7cae8348e.mp4")
-        data.add("http://qiniu-video5.vmoviercdn.com/5b7a3c0e8e5ba.mp4")
-        data.add("http://cs.vmovier.com/Uploads/cover/2017-02-23/58aec1f65a07f_cut.jpeg@607h_1080w_1e_1c.jpg")
-        data.add("http://qiniu-video3.vmoviercdn.com/5b6d535e14e32.mp4")
+        initTime()
+
+//        data.add("http://qiniu-video5.vmoviercdn.com/5b7b7cae8348e.mp4")
+        data.add("http://mp4.vjshi.com/2018-08-25/d7726fed26f1ffa33bf7cf6d438236e2.mp4")
+//        data.add("http://qiniu-video5.vmoviercdn.com/5b7a3c0e8e5ba.mp4")
+//        data.add("http://cs.vmovier.com/Uploads/cover/2017-02-23/58aec1f65a07f_cut.jpeg@607h_1080w_1e_1c.jpg")
+//        data.add("http://qiniu-video3.vmoviercdn.com/5b6d535e14e32.mp4")
         data.add("http://cs.vmovier.com/Uploads/cover/2017-02-23/58aebbf9c9d39_cut.jpeg@607h_1080w_1e_1c.jpg")
-        data.add("http://qiniu-video3.vmoviercdn.com/5b710c565d522.mp4")
+        data.add("http://mp4.vjshi.com/2018-08-25/d7726fed26f1ffa33bf7cf6d438236e2.mp4")
+
+//        data.add("http://qiniu-video3.vmoviercdn.com/5b710c565d522.mp4")
         data.add("http://cs.vmovier.com/Uploads/cover/2016-07-12/5784e8de070ec_cut.jpeg@607h_1080w_1e_1c.jpg")
-        data.add("http://qiniu-video5.vmoviercdn.com/5b63129a25b63.mp4")
+//        data.add("http://qiniu-video5.vmoviercdn.com/5b63129a25b63.mp4")
         data.add("https://cs.vmovier.com/Uploads/cover/2018-08-15/5b740b73d90ca_cut.jpeg")
+
         val height = resources.displayMetrics.widthPixels / 16 * 9
         noScrollViewPager.layoutParams.height = height
         noScrollViewPager.adapter = ViewPagerAdapter(supportFragmentManager)
@@ -45,7 +62,71 @@ class MainActivity : AppCompatActivity() {
         registerReceiver(broadcastReceiver, intentFilter)
 
         llTime.setOnClickListener {
-            startActivity(Intent(this, LoginActivity::class.java))
+            if (currentTime == 0L) {
+                currentTime = System.currentTimeMillis()
+                return@setOnClickListener
+            } else {
+                if (System.currentTimeMillis() - currentTime < 1000L) {
+                    openSetting++
+                    currentTime = System.currentTimeMillis()
+                } else {
+                    openSetting = 0
+                    currentTime = 0
+                }
+            }
+            if (openSetting == 8) {
+                openSetting = 0
+                currentTime = 0
+                startActivity(Intent(this, LoginActivity::class.java))
+            }
+        }
+        tv_call.setOnClickListener {
+            if (isCalling) return@setOnClickListener
+            object : CountDownTimer(15 * 1000L, 1 * 1000L) {
+
+                override fun onTick(millisUntilFinished: Long) {
+                    val time = millisUntilFinished / 1000
+                    if (time >= 10) {
+                        tv_call.text = "呼叫中\n${time}秒"
+                    } else {
+                        tv_call.text = "呼叫中\n0${time}秒"
+                    }
+
+                }
+
+                override fun onFinish() {
+                    isCalling = false
+                    tv_call.text = "服务"
+                }
+            }.start()
+            isCalling = true
+        }
+
+        setTime()
+//        TimeThread().start()
+    }
+
+    private fun initTime() {
+        timeHandler = TimeHandler(WeakReference(this))
+        registerReceiver(timeBr, IntentFilter("Time"))
+    }
+
+    inner class TimeThread : Thread() {
+        override fun run() {
+            super.run()
+            while (true) {
+                Thread.sleep(60 * 1000)
+                timeHandler?.sendEmptyMessage(1)
+            }
+        }
+    }
+
+    class TimeHandler(private val activity: WeakReference<MainActivity>?) : Handler() {
+
+        override fun handleMessage(msg: Message?) {
+            super.handleMessage(msg)
+            val intent = Intent("Time")
+            activity?.get()?.sendBroadcast(intent)
         }
     }
 
@@ -53,6 +134,7 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
         try {
             unregisterReceiver(broadcastReceiver)
+            unregisterReceiver(timeBr)
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -84,6 +166,21 @@ class MainActivity : AppCompatActivity() {
                 noScrollViewPager.setCurrentItem(currentPosition, true)
             }
         }
+    }
+
+    inner class TimeBroadcastReceive : BroadcastReceiver() {
+
+        override fun onReceive(context: Context?, intent: Intent?) {
+            setTime()
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    fun setTime() {
+        tvTimeMin.format12Hour = "hh:mm"
+        tvTimeMin.format24Hour = "HH:mm"
+        tvTimeYear.format12Hour = "yyyy年MM月dd日EEEE"
+        tvTimeYear.format24Hour = "yyyy年MM月dd日EEEE"
     }
 
     private inner class MyPageChangeListener : ViewPager.OnPageChangeListener {

@@ -56,11 +56,15 @@ open class VideoFileMode(var url: String?) {
         return File(filePath + File.separator + fileName)
     }
 
+    fun isDownLoadSuccess(): Boolean {
+        return getUrlVideoLocal().exists()
+    }
+
     open fun downLoadFile(callBack: DownLoadCallBack) {
         val downLoadHandle = DownLoadHandle(callBack)
         if (!TextUtils.isEmpty(url)) {
             val call = retrofit.create(DownLoadApi::class.java).downloadFile(url!!)
-            if (!getUrlVideoLocal().exists()) {
+            if (!isDownLoadSuccess()) {
                 getUrlVideoLocal().mkdir()
             } else {
                 downLoadHandle.sendEmptyMessage(0)
@@ -98,6 +102,7 @@ open class VideoFileMode(var url: String?) {
 
     private fun writeResponseBodyToDisk(filePath: String, body: ResponseBody?): Boolean {
         try {
+            Log.d("za", "保存路径$filePath")
             val futureStudioIconFile = File(filePath)
             var inputStream: InputStream? = null
             var outputStream: OutputStream? = null

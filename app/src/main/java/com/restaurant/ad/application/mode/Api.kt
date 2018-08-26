@@ -1,16 +1,52 @@
 package com.restaurant.ad.application.mode
 
-import okhttp3.MultipartBody
 import retrofit2.Call
-import retrofit2.http.Multipart
-import retrofit2.http.POST
-import retrofit2.http.Part
-import retrofit2.http.Query
+import retrofit2.http.GET
+import retrofit2.http.QueryMap
 
 interface Api {
 
-    @POST("file/upload")
-    @Multipart
-    fun uploadFile(@Part partList: List<MultipartBody.Part>, @Query("type") type: String): Call<BaseEntity<List<String>>>
+    /**
+     * 1,权限认证接口
+     */
+    @GET("api/user/login.json")
+    fun userLogin(@QueryMap() requestMap: Map<String, String>): Call<BaseEntity<List<String>>>
+
+    /**
+     * 3,模糊搜索餐厅
+     */
+    @GET("api/restaurant/list.json")
+    fun restaurantList(@QueryMap() requestMap: Map<String, String>): Call<BaseEntity<List<String>>>
+
+    /**
+     * 4，城市列表 根据城市查找餐厅
+     */
+    @GET("api/city/list.json")
+    fun cityList(): Call<BaseEntity<String>>
+
+    /**
+     * 5，分配桌号
+     */
+    @GET("pad/tableNumSetting.json")
+    fun tableNumSetting(@QueryMap() requestMap: Map<String, String>): Call<BaseEntity<String>>
+
+
+    /**
+     * 6,获取到一个餐厅已经配置的桌号
+     */
+    @GET("api/restaurant/tableNums.json")
+    fun restaurantTableNum(@QueryMap() requestMap: Map<String, String>): Call<BaseEntity<String>>
+
+    /**
+     * 7,获取广告列表
+     */
+    @GET("api/advertising/list.json")
+    fun advertisingList(@QueryMap() requestMap: Map<String, String>): Call<BaseEntity<String>>
+
+    /**
+     * 8,记录呼叫次数
+     */
+    @GET("api/restaurant/insertCallLog.json")
+    fun insertCallLog(@QueryMap() requestMap: Map<String, String>): Call<BaseEntity<String>>
 
 }

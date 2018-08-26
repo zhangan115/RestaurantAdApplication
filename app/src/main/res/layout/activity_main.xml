@@ -48,7 +48,7 @@
             android:orientation="vertical"
             android:paddingRight="46dp">
 
-            <TextView
+            <TextClock
                 android:id="@+id/tvTimeMin"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -56,15 +56,15 @@
                 android:textSize="24sp"
                 tools:text="21:28" />
 
-            <TextView
+            <TextClock
                 android:id="@+id/tvTimeYear"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
+                android:format24Hour="yyyy年MM月dd日EEEE"
                 android:lines="1"
                 android:textColor="#fff"
-                android:textSize="18sp"
-                tools:text="2018年8月11日星期六" />
+                android:textSize="18sp" />
         </LinearLayout>
 
     </RelativeLayout>
