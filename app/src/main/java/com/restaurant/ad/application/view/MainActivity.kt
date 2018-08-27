@@ -17,6 +17,7 @@ import android.support.v7.app.AppCompatActivity
 import android.view.Window
 import android.view.WindowManager
 import com.restaurant.ad.application.R
+import com.restaurant.ad.application.app.App
 import kotlinx.android.synthetic.main.activity_main.*
 import java.lang.ref.WeakReference
 import java.util.*
@@ -39,18 +40,14 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         initTime()
 
-//        data.add("http://qiniu-video5.vmoviercdn.com/5b7b7cae8348e.mp4")
-        data.add("http://mp4.vjshi.com/2018-08-25/d7726fed26f1ffa33bf7cf6d438236e2.mp4")
-//        data.add("http://qiniu-video5.vmoviercdn.com/5b7a3c0e8e5ba.mp4")
-//        data.add("http://cs.vmovier.com/Uploads/cover/2017-02-23/58aec1f65a07f_cut.jpeg@607h_1080w_1e_1c.jpg")
-//        data.add("http://qiniu-video3.vmoviercdn.com/5b6d535e14e32.mp4")
+        data.add("http://cs.vmovier.com/Uploads/cover/2017-02-23/58aec1f65a07f_cut.jpeg@607h_1080w_1e_1c.jpg")
+        data.add("http://qiniu-video3.vmoviercdn.com/5b6d535e14e32.mp4")
         data.add("http://cs.vmovier.com/Uploads/cover/2017-02-23/58aebbf9c9d39_cut.jpeg@607h_1080w_1e_1c.jpg")
-        data.add("http://mp4.vjshi.com/2018-08-25/d7726fed26f1ffa33bf7cf6d438236e2.mp4")
-
-//        data.add("http://qiniu-video3.vmoviercdn.com/5b710c565d522.mp4")
+        data.add("http://qiniu-video3.vmoviercdn.com/5b710c565d522.mp4")
         data.add("http://cs.vmovier.com/Uploads/cover/2016-07-12/5784e8de070ec_cut.jpeg@607h_1080w_1e_1c.jpg")
-//        data.add("http://qiniu-video5.vmoviercdn.com/5b63129a25b63.mp4")
+        data.add("http://qiniu-video5.vmoviercdn.com/5b63129a25b63.mp4")
         data.add("https://cs.vmovier.com/Uploads/cover/2018-08-15/5b740b73d90ca_cut.jpeg")
+        data.add("http://mp4.vjshi.com/2018-08-25/d7726fed26f1ffa33bf7cf6d438236e2.mp4")
 
         val height = resources.displayMetrics.widthPixels / 16 * 9
         noScrollViewPager.layoutParams.height = height
@@ -91,15 +88,17 @@ class MainActivity : AppCompatActivity() {
                     } else {
                         tv_call.text = "呼叫中\n0${time}秒"
                     }
-
                 }
 
                 override fun onFinish() {
                     isCalling = false
                     tv_call.text = "服务"
+                    tv_call.background = App.instance.resources.getDrawable(R.drawable.call_background)
                 }
             }.start()
             isCalling = true
+            tv_call.background = this.resources.getDrawable(R.drawable.call_ing_background)
+            //todo 呼叫服务
         }
 
         setTime()

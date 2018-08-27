@@ -63,6 +63,7 @@ class ContextFragment : Fragment(), VideoFileMode.DownLoadHandle.DownLoadCallBac
             image_view.visibility = View.GONE
             video_view.visibility = View.VISIBLE
             videoMode = VideoFileMode(url)
+
             videoMode?.downLoadFile(this)
         } else {
             image_view.visibility = View.VISIBLE
@@ -75,7 +76,7 @@ class ContextFragment : Fragment(), VideoFileMode.DownLoadHandle.DownLoadCallBac
     }
 
     override fun downSuccess() {
-        Log.d("za", "downLoad success")
+
     }
 
     override fun setUserVisibleHint(isVisibleToUser: Boolean) {
@@ -100,11 +101,7 @@ class ContextFragment : Fragment(), VideoFileMode.DownLoadHandle.DownLoadCallBac
         if (notLoad) {
             return
         }
-        if (BuildConfig.DEBUG)
-            Log.d("za", "===$isVideo")
         if (isVideo) {
-            val fileName = url?.substring(url?.lastIndexOf("/")!! + 1)
-            Log.d("za", "$fileName")
             video_view.setOnErrorListener { _, _, _ ->
                 controlHandler?.sendEmptyMessage(1)//开始计时
                 false
@@ -122,7 +119,6 @@ class ContextFragment : Fragment(), VideoFileMode.DownLoadHandle.DownLoadCallBac
                     video_view.setVideoPath(url)
                 }
             }
-
             video_view.start()
         } else {
             controlHandler?.sendEmptyMessageDelayed(1, imageTime)//开始计时

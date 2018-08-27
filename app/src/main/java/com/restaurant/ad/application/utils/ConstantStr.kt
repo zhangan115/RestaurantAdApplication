@@ -1,0 +1,8 @@
+package com.restaurant.ad.application.utils
+
+object ConstantStr {
+    const val SP_DIR = "restaurant_data"
+    const val SP_RES = "restaurant_num"//餐厅编号
+    const val SP_DEVICES_NUM = "device_num"//设备编号
+    const val SP_TABLE_NUM = "table_num"//桌号
+}

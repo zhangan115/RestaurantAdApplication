@@ -5,6 +5,7 @@ import android.os.Handler
 import android.os.Message
 import android.text.TextUtils
 import android.util.Log
+import com.restaurant.ad.application.app.App
 import com.restaurant.ad.application.mode.VideoFileMode.DownLoadHandle.DownLoadCallBack
 import okhttp3.OkHttpClient
 import okhttp3.ResponseBody
@@ -24,6 +25,8 @@ import java.util.concurrent.TimeUnit
 
 
 open class VideoFileMode(var url: String?) {
+
+    private val savePath = App.instance.externalCacheDir?.absolutePath
 
     interface DownLoadApi {
         @Streaming
@@ -51,9 +54,11 @@ open class VideoFileMode(var url: String?) {
     }
 
     fun getUrlVideoLocal(): File {
-        val fileName = url!!.substring(url!!.lastIndexOf("/") + 1)
-        val filePath = Environment.getExternalStorageDirectory().absolutePath + File.separator + Environment.DIRECTORY_MOVIES
-        return File(filePath + File.separator + fileName)
+        return File(savePath, getSaveFileName())
+    }
+
+    fun getSaveFileName():String{
+        return url!!.substring(url!!.lastIndexOf("/") + 1)
     }
 
     fun isDownLoadSuccess(): Boolean {
@@ -65,7 +70,7 @@ open class VideoFileMode(var url: String?) {
         if (!TextUtils.isEmpty(url)) {
             val call = retrofit.create(DownLoadApi::class.java).downloadFile(url!!)
             if (!isDownLoadSuccess()) {
-                getUrlVideoLocal().mkdir()
+               File(savePath).mkdir()
             } else {
                 downLoadHandle.sendEmptyMessage(0)
                 return
@@ -77,7 +82,7 @@ open class VideoFileMode(var url: String?) {
                 }
 
                 override fun onResponse(call: Call<ResponseBody>?, response: Response<ResponseBody>?) {
-                    if (response != null && response.isSuccessful && writeResponseBodyToDisk(getUrlVideoLocal().absolutePath, response.body())) {
+                    if (response != null && response.isSuccessful && writeResponseBodyToDisk(getSaveFileName(), response.body())) {
                         downLoadHandle.sendEmptyMessage(0)
                     } else {
                         downLoadHandle.sendEmptyMessage(1)
@@ -87,7 +92,7 @@ open class VideoFileMode(var url: String?) {
         }
     }
 
-    class DownLoadHandle(var callBack: DownLoadCallBack?) : Handler() {
+    class DownLoadHandle(private var callBack: DownLoadCallBack?) : Handler() {
         override fun handleMessage(msg: Message?) {
             super.handleMessage(msg)
             if (msg?.what == 0) {
@@ -100,10 +105,9 @@ open class VideoFileMode(var url: String?) {
         }
     }
 
-    private fun writeResponseBodyToDisk(filePath: String, body: ResponseBody?): Boolean {
+    private fun writeResponseBodyToDisk(fileName: String, body: ResponseBody?): Boolean {
         try {
-            Log.d("za", "保存路径$filePath")
-            val futureStudioIconFile = File(filePath)
+            val futureStudioIconFile = File(savePath, fileName)
             var inputStream: InputStream? = null
             var outputStream: OutputStream? = null
             try {
