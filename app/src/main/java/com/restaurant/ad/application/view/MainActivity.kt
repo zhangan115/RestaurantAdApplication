@@ -14,13 +14,18 @@ import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentStatePagerAdapter
 import android.support.v4.view.ViewPager
 import android.support.v7.app.AppCompatActivity
+import android.text.TextUtils
 import android.view.Window
 import android.view.WindowManager
 import com.restaurant.ad.application.R
 import com.restaurant.ad.application.app.App
+import com.restaurant.ad.application.mode.Api
+import com.restaurant.ad.application.mode.OkHttpManager
+import com.restaurant.ad.application.mode.TableMode
 import kotlinx.android.synthetic.main.activity_main.*
 import java.lang.ref.WeakReference
 import java.util.*
+import kotlin.collections.HashMap
 
 class MainActivity : AppCompatActivity() {
 
@@ -98,11 +103,21 @@ class MainActivity : AppCompatActivity() {
             }.start()
             isCalling = true
             tv_call.background = this.resources.getDrawable(R.drawable.call_ing_background)
-            //todo 呼叫服务
+            callService()
         }
-
         setTime()
-//        TimeThread().start()
+    }
+
+    /**
+     * 呼叫服务
+     */
+    private fun callService() {
+        val callManager = OkHttpManager<String>(lifecycle)
+        val requestMap = HashMap<String, String>()
+        if (!TextUtils.isEmpty(TableMode.getDeviceNum())) {
+            requestMap["padNum"] = TableMode.getTableNum()!!
+            callManager.requestData(callManager.retrofit.create(Api::class.java).insertCallLog(requestMap), {}, {})
+        }
     }
 
     private fun initTime() {

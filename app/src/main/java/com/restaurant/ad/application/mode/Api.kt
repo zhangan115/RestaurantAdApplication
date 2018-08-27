@@ -10,7 +10,7 @@ interface Api {
      * 1,权限认证接口
      */
     @GET("api/user/login.json")
-    fun userLogin(@QueryMap() requestMap: Map<String, String>): Call<BaseEntity<List<String>>>
+    fun userLogin(@QueryMap() requestMap: Map<String, String>): Call<BaseEntity<User>>
 
     /**
      * 3,模糊搜索餐厅
@@ -22,7 +22,7 @@ interface Api {
      * 4，城市列表 根据城市查找餐厅
      */
     @GET("api/city/list.json")
-    fun cityList(): Call<BaseEntity<String>>
+    fun cityList(): Call<BaseEntity<List<City>>>
 
     /**
      * 5，分配桌号
