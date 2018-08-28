@@ -16,13 +16,13 @@ interface Api {
      * 3,模糊搜索餐厅
      */
     @GET("api/restaurant/list.json")
-    fun restaurantList(@QueryMap() requestMap: Map<String, String>): Call<BaseEntity<List<String>>>
+    fun restaurantList(@QueryMap() requestMap: Map<String, String>): Call<BaseEntity<List<Restaurant>>>
 
     /**
      * 4，城市列表 根据城市查找餐厅
      */
     @GET("api/city/list.json")
-    fun cityList(): Call<BaseEntity<List<City>>>
+    fun cityList(@QueryMap() requestMap: Map<String, String>): Call<BaseEntity<List<City>>>
 
     /**
      * 5，分配桌号
@@ -35,7 +35,7 @@ interface Api {
      * 6,获取到一个餐厅已经配置的桌号
      */
     @GET("api/restaurant/tableNums.json")
-    fun restaurantTableNum(@QueryMap() requestMap: Map<String, String>): Call<BaseEntity<String>>
+    fun restaurantTableNum(@QueryMap() requestMap: Map<String, String>): Call<BaseEntity<Restaurant>>
 
     /**
      * 7,获取广告列表

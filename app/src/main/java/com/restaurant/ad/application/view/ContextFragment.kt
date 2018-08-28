@@ -104,7 +104,7 @@ class ContextFragment : Fragment(), VideoFileMode.DownLoadHandle.DownLoadCallBac
         if (isVideo) {
             video_view.setOnErrorListener { _, _, _ ->
                 controlHandler?.sendEmptyMessage(1)//开始计时
-                false
+                true
             }
             video_view.setOnPreparedListener {
                 it?.setVolume(0f, 0f)
@@ -124,7 +124,6 @@ class ContextFragment : Fragment(), VideoFileMode.DownLoadHandle.DownLoadCallBac
             controlHandler?.sendEmptyMessageDelayed(1, imageTime)//开始计时
         }
     }
-
 
     override fun onDetach() {
         super.onDetach()
