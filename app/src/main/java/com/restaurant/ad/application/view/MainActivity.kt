@@ -15,8 +15,13 @@ import android.support.v4.app.FragmentStatePagerAdapter
 import android.support.v4.view.ViewPager
 import android.support.v7.app.AppCompatActivity
 import android.text.TextUtils
+import android.util.Log
 import android.view.Window
 import android.view.WindowManager
+import android.widget.Toast
+import com.iflytek.cloud.SpeechError
+import com.iflytek.cloud.SpeechSynthesizer
+import com.iflytek.cloud.SynthesizerListener
 import com.restaurant.ad.application.R
 import com.restaurant.ad.application.app.App
 import com.restaurant.ad.application.mode.Api
@@ -26,6 +31,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 import java.lang.ref.WeakReference
 import java.util.*
 import kotlin.collections.HashMap
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -37,13 +43,19 @@ class MainActivity : AppCompatActivity() {
     private var currentTime = 0L
     private var openSetting = 0
     private var isCalling = false
+    // 语音合成对象
+    private var mTts: SpeechSynthesizer? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         requestWindowFeature(Window.FEATURE_NO_TITLE)// 隐藏标题
         window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)// 设置全屏
         setContentView(R.layout.activity_main)
         initTime()
-
+        // 初始化合成对象
+        mTts = SpeechSynthesizer.createSynthesizer(this) {
+            Log.d("za", "===>$it")
+        }
         data.add("http://cs.vmovier.com/Uploads/cover/2017-02-23/58aec1f65a07f_cut.jpeg@607h_1080w_1e_1c.jpg")
         data.add("http://qiniu-video3.vmoviercdn.com/5b6d535e14e32.mp4")
         data.add("http://cs.vmovier.com/Uploads/cover/2017-02-23/58aebbf9c9d39_cut.jpeg@607h_1080w_1e_1c.jpg")
@@ -53,8 +65,8 @@ class MainActivity : AppCompatActivity() {
         data.add("https://cs.vmovier.com/Uploads/cover/2018-08-15/5b740b73d90ca_cut.jpeg")
         data.add("http://mp4.vjshi.com/2018-08-25/d7726fed26f1ffa33bf7cf6d438236e2.mp4")
 
-        val height = resources.displayMetrics.widthPixels / 16 * 9
-        noScrollViewPager.layoutParams.height = height
+//        val height = resources.displayMetrics.widthPixels / 16 * 9
+//        noScrollViewPager.layoutParams.height = height
         noScrollViewPager.adapter = ViewPagerAdapter(supportFragmentManager)
         noScrollViewPager.addOnPageChangeListener(MyPageChangeListener())
         noScrollViewPager.offscreenPageLimit = 3
@@ -85,7 +97,7 @@ class MainActivity : AppCompatActivity() {
         }
         tv_call.setOnClickListener {
             if (isCalling) return@setOnClickListener
-            object : CountDownTimer(15 * 1000L, 1 * 1000L) {
+            object : CountDownTimer(5 * 1000L, 1 * 1000L) {
 
                 override fun onTick(millisUntilFinished: Long) {
                     val time = millisUntilFinished / 1000
@@ -120,6 +132,44 @@ class MainActivity : AppCompatActivity() {
             requestMap["padNum"] = TableMode.getDeviceNum()!!
             callManager.requestData(callManager.retrofit.create(Api::class.java).insertCallLog(requestMap), {}, {})
         }
+        val tableName = TableMode.getTableNum()
+        if (TextUtils.isEmpty(tableName)) {
+            Toast.makeText(this, "请配置桌号", Toast.LENGTH_SHORT).show()
+            return
+        }
+        val call = "${tableName}号桌的客人呼叫，请提供服务"
+        if (mTts == null) return
+        mTts!!.startSpeaking(call, object : SynthesizerListener {
+
+            override fun onBufferProgress(p0: Int, p1: Int, p2: Int, p3: String?) {
+                Log.d("za", "onBufferProgress")
+            }
+
+            override fun onSpeakBegin() {
+                Log.d("za", "onSpeakBegin")
+            }
+
+            override fun onSpeakProgress(p0: Int, p1: Int, p2: Int) {
+                Log.d("za", "onSpeakProgress")
+            }
+
+            override fun onEvent(p0: Int, p1: Int, p2: Int, p3: Bundle?) {
+                Log.d("za", "onEvent")
+            }
+
+            override fun onSpeakPaused() {
+                Log.d("za", "onSpeakPaused")
+            }
+
+            override fun onSpeakResumed() {
+                Log.d("za", "onSpeakResumed")
+            }
+
+            override fun onCompleted(p0: SpeechError?) {
+                Log.d("za", "onCompleted")
+            }
+
+        })
     }
 
     private fun initTime() {

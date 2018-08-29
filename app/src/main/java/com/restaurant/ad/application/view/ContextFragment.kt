@@ -6,11 +6,9 @@ import android.os.Handler
 import android.os.Message
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentActivity
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.restaurant.ad.application.BuildConfig
 import com.restaurant.ad.application.R
 import com.restaurant.ad.application.app.GlideApp
 import com.restaurant.ad.application.mode.VideoFileMode
@@ -124,6 +122,14 @@ class ContextFragment : Fragment(), VideoFileMode.DownLoadHandle.DownLoadCallBac
             controlHandler?.sendEmptyMessageDelayed(1, imageTime)//开始计时
         }
     }
+
+    override fun onResume() {
+        super.onResume()
+        if (videoMode != null) {
+            video_view.requestFocus()
+        }
+    }
+
 
     override fun onDetach() {
         super.onDetach()
