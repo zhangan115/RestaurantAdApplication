@@ -32,4 +32,12 @@ object TableMode {
     fun getDeviceNum(): String? {
         return App.instance.getSharedPreferences(ConstantStr.SP_DIR, Context.MODE_PRIVATE).getString(ConstantStr.SP_DEVICES_NUM, "")
     }
+
+    fun getAdList(): String? {
+        return App.instance.getSharedPreferences(ConstantStr.SP_DIR, Context.MODE_PRIVATE).getString(ConstantStr.SP_AD_LIST, "")
+    }
+
+    fun saveAdList(adList: String) {
+        App.instance.getSharedPreferences(ConstantStr.SP_DIR, Context.MODE_PRIVATE).edit().putString(ConstantStr.SP_AD_LIST, adList).apply()
+    }
 }
