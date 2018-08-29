@@ -9,9 +9,10 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.restaurant.ad.application.R
 import com.restaurant.ad.application.mode.Restaurant
- class ViewHolder(itemView: View, val imageView: ImageView
-                         , val resName: TextView
-                         , val resLocal: TextView)
+
+class ViewHolder(itemView: View, val imageView: ImageView
+                 , val resName: TextView
+                 , val resLocal: TextView)
     : RecyclerView.ViewHolder(itemView)
 
 interface RestaurantChoose {
@@ -47,6 +48,25 @@ class ResAdapter(private val datas: List<Restaurant>, private val content: Conte
             notifyDataSetChanged()
             restaurantChoose?.resChoose(restaurant)
         }
+    }
+}
+
+class TableViewHolder(itemView: View, val tableName: TextView) : RecyclerView.ViewHolder(itemView)
+
+class TableAdapter(private val datas: List<String>, private val content: Context) : RecyclerView.Adapter<TableViewHolder>() {
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TableViewHolder {
+        val view = LayoutInflater.from(content).inflate(R.layout.item_table, parent, false)
+        val tableName = view.findViewById<TextView>(R.id.table_name)
+        return TableViewHolder(view, tableName)
+    }
+
+    override fun getItemCount(): Int {
+        return datas.size
+    }
+
+    override fun onBindViewHolder(holder: TableViewHolder, position: Int) {
+        holder.tableName.text = datas[position]
     }
 
 }

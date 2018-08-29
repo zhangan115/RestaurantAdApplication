@@ -142,6 +142,8 @@
                         android:id="@+id/recycleView_table_num"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:paddingLeft="10dp"
+                        android:paddingRight="10dp"
                         android:scrollbars="none" />
 
                     <TextView
@@ -176,12 +178,13 @@
                         android:textSize="15sp" />
 
                     <TextView
+                        android:id="@+id/res_name"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:padding="10dp"
-                        android:text="外婆印象店"
                         android:textColor="#333333"
-                        android:textSize="15sp" />
+                        android:textSize="15sp"
+                        tools:text="外婆印象店" />
 
                     <TextView
                         android:layout_width="match_parent"
@@ -242,7 +245,7 @@
                         android:orientation="vertical">
 
                         <TextView
-                            android:id="@+id/btnLogin"
+                            android:id="@+id/btnBind"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="10dp"

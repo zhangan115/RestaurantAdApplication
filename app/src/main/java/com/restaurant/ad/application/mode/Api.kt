@@ -27,7 +27,7 @@ interface Api {
     /**
      * 5，分配桌号
      */
-    @GET("pad/tableNumSetting.json")
+    @GET("api/pad/tableNumSetting.json")
     fun tableNumSetting(@QueryMap() requestMap: Map<String, String>): Call<BaseEntity<String>>
 
 

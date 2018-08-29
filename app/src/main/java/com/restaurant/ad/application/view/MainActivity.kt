@@ -33,7 +33,6 @@ class MainActivity : AppCompatActivity() {
     private val broadcastReceiver = NextBroadcastReceive()
     private var currentPosition: Int = 1
     private var timeHandler: TimeHandler? = null
-    private val timeBr: TimeBroadcastReceive = TimeBroadcastReceive()
 
     private var currentTime = 0L
     private var openSetting = 0
@@ -60,7 +59,9 @@ class MainActivity : AppCompatActivity() {
         noScrollViewPager.addOnPageChangeListener(MyPageChangeListener())
         noScrollViewPager.offscreenPageLimit = 3
         noScrollViewPager.setCurrentItem(1, false)
-        val intentFilter = IntentFilter("next")
+        val intentFilter = IntentFilter()
+        intentFilter.addAction("requestAdList")
+        intentFilter.addAction("next")
         registerReceiver(broadcastReceiver, intentFilter)
 
         llTime.setOnClickListener {
@@ -106,6 +107,7 @@ class MainActivity : AppCompatActivity() {
             callService()
         }
         setTime()
+        requestAdList()
     }
 
     /**
@@ -115,14 +117,13 @@ class MainActivity : AppCompatActivity() {
         val callManager = OkHttpManager<String>(lifecycle)
         val requestMap = HashMap<String, String>()
         if (!TextUtils.isEmpty(TableMode.getDeviceNum())) {
-            requestMap["padNum"] = TableMode.getTableNum()!!
+            requestMap["padNum"] = TableMode.getDeviceNum()!!
             callManager.requestData(callManager.retrofit.create(Api::class.java).insertCallLog(requestMap), {}, {})
         }
     }
 
     private fun initTime() {
         timeHandler = TimeHandler(WeakReference(this))
-        registerReceiver(timeBr, IntentFilter("Time"))
     }
 
     inner class TimeThread : Thread() {
@@ -148,7 +149,6 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
         try {
             unregisterReceiver(broadcastReceiver)
-            unregisterReceiver(timeBr)
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -175,18 +175,28 @@ class MainActivity : AppCompatActivity() {
 
         override fun onReceive(contenxt: Context?, intent: Intent?) {
             if (intent != null) {
-                currentPosition = noScrollViewPager.currentItem
-                ++currentPosition
-                noScrollViewPager.setCurrentItem(currentPosition, true)
+                if (TextUtils.equals(intent.action, "next")) {
+                    currentPosition = noScrollViewPager.currentItem
+                    ++currentPosition
+                    noScrollViewPager.setCurrentItem(currentPosition, true)
+                } else if (TextUtils.equals(intent.action, "requestAdList")) {
+                    requestAdList()
+                }
             }
         }
     }
 
-    inner class TimeBroadcastReceive : BroadcastReceiver() {
+    private fun requestAdList() {
+        val manager = OkHttpManager<String>(lifecycle)
+        val padNum = TableMode.getDeviceNum()
+        if (TextUtils.isEmpty(padNum)) return
+        val requestMap = HashMap<String, String>()
+        requestMap["padNum"] = padNum!!
+        manager.requestData(manager.retrofit.create(Api::class.java).advertisingList(requestMap), {
 
-        override fun onReceive(context: Context?, intent: Intent?) {
-            setTime()
-        }
+        }, {
+
+        })
     }
 
     @SuppressLint("SetTextI18n")
