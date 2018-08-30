@@ -19,23 +19,22 @@ import android.util.Log
 import android.view.Window
 import android.view.WindowManager
 import android.widget.Toast
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import com.iflytek.cloud.SpeechError
 import com.iflytek.cloud.SpeechSynthesizer
 import com.iflytek.cloud.SynthesizerListener
 import com.restaurant.ad.application.R
 import com.restaurant.ad.application.app.App
-import com.restaurant.ad.application.mode.Api
-import com.restaurant.ad.application.mode.OkHttpManager
-import com.restaurant.ad.application.mode.TableMode
+import com.restaurant.ad.application.mode.*
+import com.restaurant.ad.application.utils.GlideBlurTransformation
 import kotlinx.android.synthetic.main.activity_main.*
 import java.lang.ref.WeakReference
-import java.util.*
-import kotlin.collections.HashMap
 
 
 class MainActivity : AppCompatActivity() {
 
-    private val data = ArrayList<String>()
+    private val data = ArrayList<AdDataBean>()
     private val broadcastReceiver = NextBroadcastReceive()
     private var currentPosition: Int = 1
     private var timeHandler: TimeHandler? = null
@@ -43,33 +42,25 @@ class MainActivity : AppCompatActivity() {
     private var currentTime = 0L
     private var openSetting = 0
     private var isCalling = false
+    private lateinit var viewPagerAdapter: ViewPagerAdapter
     // 语音合成对象
     private var mTts: SpeechSynthesizer? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         requestWindowFeature(Window.FEATURE_NO_TITLE)// 隐藏标题
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)// 设置全屏
         setContentView(R.layout.activity_main)
         initTime()
         // 初始化合成对象
-        mTts = SpeechSynthesizer.createSynthesizer(this) {
-            Log.d("za", "===>$it")
-        }
-        data.add("http://cs.vmovier.com/Uploads/cover/2017-02-23/58aec1f65a07f_cut.jpeg@607h_1080w_1e_1c.jpg")
-        data.add("http://qiniu-video3.vmoviercdn.com/5b6d535e14e32.mp4")
-        data.add("http://cs.vmovier.com/Uploads/cover/2017-02-23/58aebbf9c9d39_cut.jpeg@607h_1080w_1e_1c.jpg")
-        data.add("http://qiniu-video3.vmoviercdn.com/5b710c565d522.mp4")
-        data.add("http://cs.vmovier.com/Uploads/cover/2016-07-12/5784e8de070ec_cut.jpeg@607h_1080w_1e_1c.jpg")
-        data.add("http://qiniu-video5.vmoviercdn.com/5b63129a25b63.mp4")
-        data.add("https://cs.vmovier.com/Uploads/cover/2018-08-15/5b740b73d90ca_cut.jpeg")
-        data.add("http://mp4.vjshi.com/2018-08-25/d7726fed26f1ffa33bf7cf6d438236e2.mp4")
-
+        mTts = SpeechSynthesizer.createSynthesizer(this) {}
 //        val height = resources.displayMetrics.widthPixels / 16 * 9
 //        noScrollViewPager.layoutParams.height = height
-        noScrollViewPager.adapter = ViewPagerAdapter(supportFragmentManager)
+        viewPagerAdapter = ViewPagerAdapter(supportFragmentManager)
+        noScrollViewPager.adapter = viewPagerAdapter
         noScrollViewPager.addOnPageChangeListener(MyPageChangeListener())
-        noScrollViewPager.offscreenPageLimit = 3
+        noScrollViewPager.offscreenPageLimit = 2
         noScrollViewPager.setCurrentItem(1, false)
         val intentFilter = IntentFilter()
         intentFilter.addAction("requestAdList")
@@ -176,16 +167,6 @@ class MainActivity : AppCompatActivity() {
         timeHandler = TimeHandler(WeakReference(this))
     }
 
-    inner class TimeThread : Thread() {
-        override fun run() {
-            super.run()
-            while (true) {
-                Thread.sleep(60 * 1000)
-                timeHandler?.sendEmptyMessage(1)
-            }
-        }
-    }
-
     class TimeHandler(private val activity: WeakReference<MainActivity>?) : Handler() {
 
         override fun handleMessage(msg: Message?) {
@@ -210,7 +191,7 @@ class MainActivity : AppCompatActivity() {
             return if (position == 0) {
                 ContextFragment.newInstance(true)
             } else if (position > 0 && position <= data.size) {
-                ContextFragment.newInstance(data[position - 1])
+                ContextFragment.newInstance(data[position - 1].url, data[position - 1].isVideo, data[position - 1].time)
             } else {
                 ContextFragment.newInstance(true)
             }
@@ -229,6 +210,7 @@ class MainActivity : AppCompatActivity() {
                     currentPosition = noScrollViewPager.currentItem
                     ++currentPosition
                     noScrollViewPager.setCurrentItem(currentPosition, true)
+                    showGlide()
                 } else if (TextUtils.equals(intent.action, "requestAdList")) {
                     requestAdList()
                 }
@@ -236,14 +218,58 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun showGlide() {
+        if (currentPosition > 0 && currentPosition <= data.size) {
+            if (!data[currentPosition - 1].isVideo) {
+                Glide.with(this).load(data[currentPosition - 1].url)
+                        .apply(RequestOptions.bitmapTransform(GlideBlurTransformation(this))).into(iv_call_background);
+            } else {
+                iv_call_background.setImageDrawable(this.resources.getDrawable(R.drawable.app_home_bg))
+            }
+        } else {
+            iv_call_background.setImageDrawable(this.resources.getDrawable(R.drawable.app_home_bg))
+        }
+    }
+
     private fun requestAdList() {
-        val manager = OkHttpManager<String>(lifecycle)
+        val manager = OkHttpManager<List<AdListBean>>(lifecycle)
         val padNum = TableMode.getDeviceNum()
         if (TextUtils.isEmpty(padNum)) return
         val requestMap = HashMap<String, String>()
         requestMap["padNum"] = padNum!!
         manager.requestData(manager.retrofit.create(Api::class.java).advertisingList(requestMap), {
-
+            if (it != null && it.isNotEmpty()) {
+                data.clear()
+                for (ad in it) {
+                    if (ad.type == 1) {
+                        val imageList = ArrayList<String>()
+                        if (!TextUtils.isEmpty(ad.image1)) {
+                            imageList.add(ad.image1!!)
+                        }
+                        if (!TextUtils.isEmpty(ad.image2)) {
+                            imageList.add(ad.image2!!)
+                        }
+                        if (!TextUtils.isEmpty(ad.image3)) {
+                            imageList.add(ad.image3!!)
+                        }
+                        for (image in imageList) {
+                            data.add(AdDataBean(image, AD_SHOW_TIME / imageList.size.toLong(), false))
+                        }
+                    } else {
+                        if (!TextUtils.isEmpty(ad.videoUrl)) {
+                            data.add(AdDataBean(ad.videoUrl!!, 0L, true))
+                        }
+                    }
+                }
+                if (data.isNotEmpty()) {
+                    viewPagerAdapter = ViewPagerAdapter(supportFragmentManager)
+                    noScrollViewPager.adapter = viewPagerAdapter
+                    noScrollViewPager.addOnPageChangeListener(MyPageChangeListener())
+                    noScrollViewPager.offscreenPageLimit = 2
+                    noScrollViewPager.setCurrentItem(1, false)
+                    VideoFileMode.cleanVideoFile(data)
+                }
+            }
         }, {
 
         })

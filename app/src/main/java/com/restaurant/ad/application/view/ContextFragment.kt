@@ -1,11 +1,14 @@
 package com.restaurant.ad.application.view
 
 import android.content.Intent
+import android.graphics.Color
+import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.Handler
 import android.os.Message
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentActivity
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -35,6 +38,9 @@ class ContextFragment : Fragment(), VideoFileMode.DownLoadHandle.DownLoadCallBac
     private var controlHandler: Handler? = null
     private var videoMode: VideoFileMode? = null
 
+    private var videoPlayPosition = 0
+    private var isPlaying = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -50,7 +56,6 @@ class ContextFragment : Fragment(), VideoFileMode.DownLoadHandle.DownLoadCallBac
         return inflater.inflate(R.layout.fragment_context, container, false)
     }
 
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         if (activity != null) {
@@ -61,7 +66,6 @@ class ContextFragment : Fragment(), VideoFileMode.DownLoadHandle.DownLoadCallBac
             image_view.visibility = View.GONE
             video_view.visibility = View.VISIBLE
             videoMode = VideoFileMode(url)
-
             videoMode?.downLoadFile(this)
         } else {
             image_view.visibility = View.VISIBLE
@@ -105,9 +109,15 @@ class ContextFragment : Fragment(), VideoFileMode.DownLoadHandle.DownLoadCallBac
                 true
             }
             video_view.setOnPreparedListener {
+                it?.setOnInfoListener { _, what, _ ->
+                    if (what == MediaPlayer.MEDIA_INFO_VIDEO_RENDERING_START)
+                        video_view.setBackgroundColor(Color.TRANSPARENT);
+                    true
+                }
                 it?.setVolume(0f, 0f)
             }
             video_view.setOnCompletionListener {
+                video_view.stopPlayback()
                 controlHandler?.sendEmptyMessage(1)//开始计时
             }
             if (videoMode != null) {
@@ -128,6 +138,20 @@ class ContextFragment : Fragment(), VideoFileMode.DownLoadHandle.DownLoadCallBac
         if (videoMode != null) {
             video_view.requestFocus()
         }
+        if (isVideo && !video_view.isPlaying && isPlaying) {
+            video_view.seekTo(videoPlayPosition)
+            video_view.start()
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        if (video_view.isPlaying) {
+            isPlaying = true
+            videoPlayPosition = video_view.currentPosition
+        } else {
+            isPlaying = false
+        }
     }
 
 
@@ -139,8 +163,8 @@ class ContextFragment : Fragment(), VideoFileMode.DownLoadHandle.DownLoadCallBac
 
     class ControlHandler internal constructor(private val activity: WeakReference<FragmentActivity>?) : Handler() {
         override fun handleMessage(msg: Message?) {
-            super.handleMessage(msg)
             if (msg != null) {
+                Log.d("ZA", "next")
                 activity?.get()?.sendBroadcast(Intent("next"))
             }
         }

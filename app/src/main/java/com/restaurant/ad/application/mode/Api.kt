@@ -41,7 +41,7 @@ interface Api {
      * 7,获取广告列表
      */
     @GET("api/advertising/list.json")
-    fun advertisingList(@QueryMap() requestMap: Map<String, String>): Call<BaseEntity<String>>
+    fun advertisingList(@QueryMap() requestMap: Map<String, String>): Call<BaseEntity<List<AdListBean>>>
 
     /**
      * 8,记录呼叫次数

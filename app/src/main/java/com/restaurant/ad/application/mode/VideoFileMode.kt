@@ -1,6 +1,5 @@
 package com.restaurant.ad.application.mode
 
-import android.os.Environment
 import android.os.Handler
 import android.os.Message
 import android.text.TextUtils
@@ -25,8 +24,6 @@ import java.util.concurrent.TimeUnit
 
 
 open class VideoFileMode(var url: String?) {
-
-    private val savePath = App.instance.externalCacheDir?.absolutePath
 
     interface DownLoadApi {
         @Streaming
@@ -57,7 +54,7 @@ open class VideoFileMode(var url: String?) {
         return File(savePath, getSaveFileName())
     }
 
-    fun getSaveFileName():String{
+    fun getSaveFileName(): String {
         return url!!.substring(url!!.lastIndexOf("/") + 1)
     }
 
@@ -70,7 +67,7 @@ open class VideoFileMode(var url: String?) {
         if (!TextUtils.isEmpty(url)) {
             val call = retrofit.create(DownLoadApi::class.java).downloadFile(url!!)
             if (!isDownLoadSuccess()) {
-               File(savePath).mkdir()
+                File(savePath).mkdir()
             } else {
                 downLoadHandle.sendEmptyMessage(0)
                 return
@@ -131,6 +128,36 @@ open class VideoFileMode(var url: String?) {
             }
         } catch (e: IOException) {
             return false
+        }
+    }
+
+    companion object {
+        val savePath = App.instance.externalCacheDir?.absolutePath
+
+        fun cleanVideoFile(adList: ArrayList<AdDataBean>) {
+            val videoAd = ArrayList<AdDataBean>()
+            for (ad in adList) {
+                if (ad.isVideo) {
+                    videoAd.add(ad)
+                }
+            }
+            val files = File(savePath).list()
+            val deleteFile = ArrayList<String>()
+            for (f in files) {
+                var isSave = false
+                for (v in videoAd) {
+                    if (TextUtils.equals(f, v.url.substring(v.url.lastIndexOf("/") + 1))) {
+                        isSave = true
+                        break
+                    }
+                }
+                if (!isSave) {
+                    deleteFile.add(f)
+                }
+            }
+            for (delete in deleteFile) {
+                File(savePath, delete).delete()
+            }
         }
     }
 }
