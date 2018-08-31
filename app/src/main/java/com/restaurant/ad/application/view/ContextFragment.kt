@@ -12,9 +12,12 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import com.restaurant.ad.application.R
 import com.restaurant.ad.application.app.GlideApp
 import com.restaurant.ad.application.mode.VideoFileMode
+import com.restaurant.ad.application.utils.GlideBlurTransformation
 import kotlinx.android.synthetic.main.fragment_context.*
 import java.lang.ref.WeakReference
 
@@ -66,6 +69,7 @@ class ContextFragment : Fragment(), VideoFileMode.DownLoadHandle.DownLoadCallBac
             image_view.visibility = View.GONE
             video_view.visibility = View.VISIBLE
             videoMode = VideoFileMode(url)
+            iv_call_background.setImageDrawable(this.resources.getDrawable(R.drawable.app_home_bg))
             videoMode?.downLoadFile(this)
         } else {
             image_view.visibility = View.VISIBLE
@@ -73,6 +77,8 @@ class ContextFragment : Fragment(), VideoFileMode.DownLoadHandle.DownLoadCallBac
             GlideApp.with(this).load(url)
                     .placeholder(R.drawable.shape_image_background)
                     .into(image_view)
+            Glide.with(this).load(url)
+                    .apply(RequestOptions.bitmapTransform(GlideBlurTransformation(activity))).into(iv_call_background);
         }
         lazyLoad()
     }
@@ -126,6 +132,7 @@ class ContextFragment : Fragment(), VideoFileMode.DownLoadHandle.DownLoadCallBac
                 } else {
                     video_view.setVideoPath(url)
                 }
+//                video_view.setVideoPath(url)
             }
             video_view.start()
         } else {

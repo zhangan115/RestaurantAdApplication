@@ -16,18 +16,15 @@ import android.support.v4.view.ViewPager
 import android.support.v7.app.AppCompatActivity
 import android.text.TextUtils
 import android.util.Log
+import android.view.View
 import android.view.Window
 import android.view.WindowManager
 import android.widget.Toast
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.RequestOptions
 import com.iflytek.cloud.SpeechError
 import com.iflytek.cloud.SpeechSynthesizer
 import com.iflytek.cloud.SynthesizerListener
 import com.restaurant.ad.application.R
-import com.restaurant.ad.application.app.App
 import com.restaurant.ad.application.mode.*
-import com.restaurant.ad.application.utils.GlideBlurTransformation
 import kotlinx.android.synthetic.main.activity_main.*
 import java.lang.ref.WeakReference
 
@@ -60,7 +57,7 @@ class MainActivity : AppCompatActivity() {
         viewPagerAdapter = ViewPagerAdapter(supportFragmentManager)
         noScrollViewPager.adapter = viewPagerAdapter
         noScrollViewPager.addOnPageChangeListener(MyPageChangeListener())
-        noScrollViewPager.offscreenPageLimit = 2
+        noScrollViewPager.offscreenPageLimit = 1
         noScrollViewPager.setCurrentItem(1, false)
         val intentFilter = IntentFilter()
         intentFilter.addAction("requestAdList")
@@ -86,27 +83,30 @@ class MainActivity : AppCompatActivity() {
                 startActivity(Intent(this, LoginActivity::class.java))
             }
         }
-        tv_call.setOnClickListener {
+        ivCallBg.visibility = View.INVISIBLE
+        callLayout.setOnClickListener {
             if (isCalling) return@setOnClickListener
-            object : CountDownTimer(5 * 1000L, 1 * 1000L) {
+            ivCallBg.visibility = View.VISIBLE
+            ivCall.setImageDrawable(applicationContext.resources.getDrawable(R.drawable.call_btn2))
+            object : CountDownTimer(6 * 1000L, 1 * 1000L) {
 
                 override fun onTick(millisUntilFinished: Long) {
                     val time = millisUntilFinished / 1000
                     if (time >= 10) {
-                        tv_call.text = "呼叫中\n${time}秒"
+                        tvCall.text = "呼叫中\n${time}秒"
                     } else {
-                        tv_call.text = "呼叫中\n0${time}秒"
+                        tvCall.text = "呼叫中\n0${time}秒"
                     }
                 }
 
                 override fun onFinish() {
                     isCalling = false
-                    tv_call.text = "服务"
-                    tv_call.background = App.instance.resources.getDrawable(R.drawable.call_background)
+                    ivCallBg.visibility = View.INVISIBLE
+                    tvCall.text = "服务"
+                    ivCall.setImageDrawable(applicationContext.resources.getDrawable(R.drawable.call_background))
                 }
             }.start()
             isCalling = true
-            tv_call.background = this.resources.getDrawable(R.drawable.call_ing_background)
             callService()
         }
         setTime()
@@ -210,24 +210,10 @@ class MainActivity : AppCompatActivity() {
                     currentPosition = noScrollViewPager.currentItem
                     ++currentPosition
                     noScrollViewPager.setCurrentItem(currentPosition, true)
-                    showGlide()
                 } else if (TextUtils.equals(intent.action, "requestAdList")) {
                     requestAdList()
                 }
             }
-        }
-    }
-
-    private fun showGlide() {
-        if (currentPosition > 0 && currentPosition <= data.size) {
-            if (!data[currentPosition - 1].isVideo) {
-                Glide.with(this).load(data[currentPosition - 1].url)
-                        .apply(RequestOptions.bitmapTransform(GlideBlurTransformation(this))).into(iv_call_background);
-            } else {
-                iv_call_background.setImageDrawable(this.resources.getDrawable(R.drawable.app_home_bg))
-            }
-        } else {
-            iv_call_background.setImageDrawable(this.resources.getDrawable(R.drawable.app_home_bg))
         }
     }
 
@@ -265,7 +251,7 @@ class MainActivity : AppCompatActivity() {
                     viewPagerAdapter = ViewPagerAdapter(supportFragmentManager)
                     noScrollViewPager.adapter = viewPagerAdapter
                     noScrollViewPager.addOnPageChangeListener(MyPageChangeListener())
-                    noScrollViewPager.offscreenPageLimit = 2
+                    noScrollViewPager.offscreenPageLimit = 1
                     noScrollViewPager.setCurrentItem(1, false)
                     VideoFileMode.cleanVideoFile(data)
                 }

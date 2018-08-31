@@ -6,9 +6,13 @@ import android.text.TextUtils
 import android.util.Log
 import com.restaurant.ad.application.app.App
 import com.restaurant.ad.application.mode.VideoFileMode.DownLoadHandle.DownLoadCallBack
+import kotlinx.coroutines.experimental.launch
 import okhttp3.OkHttpClient
 import okhttp3.ResponseBody
 import okhttp3.logging.HttpLoggingInterceptor
+import okio.BufferedSink
+import okio.Okio
+import okio.Sink
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -32,7 +36,6 @@ open class VideoFileMode(var url: String?) {
     }
 
     private val okHttpClient: OkHttpClient = OkHttpClient().newBuilder()
-            .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
             .connectTimeout(5, TimeUnit.SECONDS)
             .readTimeout(5, TimeUnit.SECONDS)
             .writeTimeout(20, TimeUnit.SECONDS)
@@ -65,27 +68,37 @@ open class VideoFileMode(var url: String?) {
     open fun downLoadFile(callBack: DownLoadCallBack) {
         val downLoadHandle = DownLoadHandle(callBack)
         if (!TextUtils.isEmpty(url)) {
-            val call = retrofit.create(DownLoadApi::class.java).downloadFile(url!!)
-            if (!isDownLoadSuccess()) {
-                File(savePath).mkdir()
-            } else {
-                downLoadHandle.sendEmptyMessage(0)
-                return
-            }
-            call.enqueue(object : Callback<ResponseBody> {
-                override fun onFailure(call: Call<ResponseBody>?, t: Throwable?) {
-                    t?.printStackTrace()
-                    downLoadHandle.sendEmptyMessage(1)
-                }
-
-                override fun onResponse(call: Call<ResponseBody>?, response: Response<ResponseBody>?) {
-                    if (response != null && response.isSuccessful && writeResponseBodyToDisk(getSaveFileName(), response.body())) {
-                        downLoadHandle.sendEmptyMessage(0)
+            launch {
+                val call = retrofit.create(DownLoadApi::class.java).downloadFile(url!!)
+                if (isDownLoadSuccess()) {
+                    downLoadHandle.sendEmptyMessage(0)
+                } else {
+                    File(savePath).mkdir()
+                    val response = call.execute()
+                    if (response != null && response.isSuccessful) {
+                        var sink: Sink? = null
+                        var bufferedSink: BufferedSink? = null
+                        try {
+                            sink = Okio.sink(File(savePath, getSaveFileName()))
+                            if (sink != null) {
+                                bufferedSink = Okio.buffer(sink)
+                                bufferedSink.writeAll(response.body()!!.source())
+                                bufferedSink.close()
+                            }
+                            Log.i("DOWNLOAD", "download success")
+                            downLoadHandle.sendEmptyMessage(0)
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                            downLoadHandle.sendEmptyMessage(1)
+                        } finally {
+                            sink?.close()
+                            bufferedSink?.close()
+                        }
                     } else {
                         downLoadHandle.sendEmptyMessage(1)
                     }
                 }
-            })
+            }
         }
     }
 
@@ -108,7 +121,7 @@ open class VideoFileMode(var url: String?) {
             var inputStream: InputStream? = null
             var outputStream: OutputStream? = null
             try {
-                val fileReader = ByteArray(4096)
+                val fileReader = ByteArray(1024)
                 inputStream = body?.byteStream()
                 outputStream = FileOutputStream(futureStudioIconFile)
                 while (true) {

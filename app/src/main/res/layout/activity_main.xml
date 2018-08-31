@@ -6,79 +6,81 @@
     android:orientation="vertical"
     tools:context=".view.MainActivity">
 
-    <ImageView
-        android:id="@+id/iv_call_background"
+    <com.restaurant.ad.application.widget.NoScrollViewPager
+        android:id="@+id/noScrollViewPager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:contentDescription="@string/image_des_call_background"
-        android:scaleType="centerCrop"
-        android:src="@drawable/app_home_bg" />
+        android:scrollbars="none" />
 
-    <LinearLayout
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center">
-
-            <com.restaurant.ad.application.widget.NoScrollViewPager
-                android:id="@+id/noScrollViewPager"
-                android:layout_width="533dp"
-                android:layout_height="300dp"
-                android:background="@color/colorPrimary"
-                android:scrollbars="none" />
-        </LinearLayout>
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_marginBottom="30dp"
+        android:orientation="horizontal">
 
         <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/callLayout"
+            android:layout_gravity="center">
+
+            <ImageView
+                android:id="@+id/ivCallBg"
+                android:layout_width="107dp"
+                android:layout_height="107dp"
+                android:layout_centerInParent="true"
+                android:src="@drawable/call_btn2"
+                android:visibility="visible" />
+
+            <ImageView
+                android:id="@+id/ivCall"
+                android:layout_width="86dp"
+                android:layout_height="86dp"
+                android:layout_centerInParent="true"
+                android:src="@drawable/call_background" />
 
             <TextView
-                android:id="@+id/tv_call"
+                android:id="@+id/tvCall"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
-                android:layout_gravity="center"
-                android:background="@drawable/call_background"
                 android:gravity="center"
                 android:text="@string/call"
                 android:textColor="@android:color/white"
-                android:textSize="20sp" />
+                android:textSize="16sp" />
+        </RelativeLayout>
 
-            <LinearLayout
-                android:id="@+id/llTime"
+        <LinearLayout
+            android:id="@+id/llTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_gravity="right|bottom"
+            android:gravity="right"
+            android:orientation="vertical"
+            android:paddingRight="46dp">
+
+            <TextClock
+                android:id="@+id/tvTimeMin"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentRight="true"
-                android:layout_marginBottom="40px"
-                android:gravity="right"
-                android:orientation="vertical"
-                android:paddingRight="46dp">
+                android:textColor="#fff"
+                android:textSize="24sp"
+                tools:text="21:28" />
 
-                <TextClock
-                    android:id="@+id/tvTimeMin"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="#fff"
-                    android:textSize="24sp"
-                    tools:text="21:28" />
+            <TextClock
+                android:id="@+id/tvTimeYear"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:format24Hour="yyyy年MM月dd日EEEE"
+                android:lines="1"
+                android:textColor="#fff"
+                android:textSize="18sp" />
+        </LinearLayout>
 
-                <TextClock
-                    android:id="@+id/tvTimeYear"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:format24Hour="yyyy年MM月dd日EEEE"
-                    android:lines="1"
-                    android:textColor="#fff"
-                    android:textSize="18sp" />
-            </LinearLayout>
-
-        </RelativeLayout>
-    </LinearLayout>
+    </FrameLayout>
 
 </FrameLayout>

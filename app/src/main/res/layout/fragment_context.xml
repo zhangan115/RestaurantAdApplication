@@ -5,16 +5,26 @@
     android:layout_height="match_parent"
     tools:context=".view.ContextFragment">
 
-    <VideoView
-        android:id="@+id/video_view"
+    <ImageView
+        android:id="@+id/iv_call_background"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:contentDescription="@string/image_des_call_background"
+        android:scaleType="centerCrop"
+        android:src="@drawable/app_home_bg" />
+
+    <VideoView
+        android:id="@+id/video_view"
+        android:layout_width="720dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_height="405dp"
         android:visibility="gone" />
 
     <ImageView
         android:id="@+id/image_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="720dp"
+        android:layout_height="405dp"
+        android:layout_gravity="center_horizontal"
         android:contentDescription="@string/show_picture"
         android:scaleType="centerCrop"
         android:visibility="gone" />
