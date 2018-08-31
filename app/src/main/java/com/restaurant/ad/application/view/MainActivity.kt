@@ -20,6 +20,8 @@ import android.view.View
 import android.view.Window
 import android.view.WindowManager
 import android.widget.Toast
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.iflytek.cloud.SpeechError
 import com.iflytek.cloud.SpeechSynthesizer
 import com.iflytek.cloud.SynthesizerListener
@@ -86,28 +88,29 @@ class MainActivity : AppCompatActivity() {
         ivCallBg.visibility = View.INVISIBLE
         callLayout.setOnClickListener {
             if (isCalling) return@setOnClickListener
-            ivCallBg.visibility = View.VISIBLE
-            ivCall.setImageDrawable(applicationContext.resources.getDrawable(R.drawable.call_btn2))
-            object : CountDownTimer(6 * 1000L, 1 * 1000L) {
+            if (callService()) {
+                ivCallBg.visibility = View.VISIBLE
+                ivCall.setImageDrawable(applicationContext.resources.getDrawable(R.drawable.call_btn2))
+                object : CountDownTimer(6 * 1000L, 1 * 1000L) {
 
-                override fun onTick(millisUntilFinished: Long) {
-                    val time = millisUntilFinished / 1000
-                    if (time >= 10) {
-                        tvCall.text = "呼叫中\n${time}秒"
-                    } else {
-                        tvCall.text = "呼叫中\n0${time}秒"
+                    override fun onTick(millisUntilFinished: Long) {
+                        val time = millisUntilFinished / 1000
+                        if (time >= 10) {
+                            tvCall.text = "呼叫中\n${time}秒"
+                        } else {
+                            tvCall.text = "呼叫中\n0${time}秒"
+                        }
                     }
-                }
 
-                override fun onFinish() {
-                    isCalling = false
-                    ivCallBg.visibility = View.INVISIBLE
-                    tvCall.text = "服务"
-                    ivCall.setImageDrawable(applicationContext.resources.getDrawable(R.drawable.call_background))
-                }
-            }.start()
-            isCalling = true
-            callService()
+                    override fun onFinish() {
+                        isCalling = false
+                        ivCallBg.visibility = View.INVISIBLE
+                        tvCall.text = "服务"
+                        ivCall.setImageDrawable(applicationContext.resources.getDrawable(R.drawable.call_background))
+                    }
+                }.start()
+                isCalling = true
+            }
         }
         setTime()
         requestAdList()
@@ -116,7 +119,7 @@ class MainActivity : AppCompatActivity() {
     /**
      * 呼叫服务
      */
-    private fun callService() {
+    private fun callService(): Boolean {
         val callManager = OkHttpManager<String>(lifecycle)
         val requestMap = HashMap<String, String>()
         if (!TextUtils.isEmpty(TableMode.getDeviceNum())) {
@@ -126,10 +129,10 @@ class MainActivity : AppCompatActivity() {
         val tableName = TableMode.getTableNum()
         if (TextUtils.isEmpty(tableName)) {
             Toast.makeText(this, "请配置桌号", Toast.LENGTH_SHORT).show()
-            return
+            return false
         }
         val call = "${tableName}号桌的客人呼叫，请提供服务"
-        if (mTts == null) return
+        if (mTts == null) return false
         mTts!!.startSpeaking(call, object : SynthesizerListener {
 
             override fun onBufferProgress(p0: Int, p1: Int, p2: Int, p3: String?) {
@@ -161,6 +164,7 @@ class MainActivity : AppCompatActivity() {
             }
 
         })
+        return true
     }
 
     private fun initTime() {
@@ -225,40 +229,53 @@ class MainActivity : AppCompatActivity() {
         requestMap["padNum"] = padNum!!
         manager.requestData(manager.retrofit.create(Api::class.java).advertisingList(requestMap), {
             if (it != null && it.isNotEmpty()) {
-                data.clear()
-                for (ad in it) {
-                    if (ad.type == 1) {
-                        val imageList = ArrayList<String>()
-                        if (!TextUtils.isEmpty(ad.image1)) {
-                            imageList.add(ad.image1!!)
-                        }
-                        if (!TextUtils.isEmpty(ad.image2)) {
-                            imageList.add(ad.image2!!)
-                        }
-                        if (!TextUtils.isEmpty(ad.image3)) {
-                            imageList.add(ad.image3!!)
-                        }
-                        for (image in imageList) {
-                            data.add(AdDataBean(image, AD_SHOW_TIME / imageList.size.toLong(), false))
-                        }
-                    } else {
-                        if (!TextUtils.isEmpty(ad.videoUrl)) {
-                            data.add(AdDataBean(ad.videoUrl!!, 0L, true))
-                        }
-                    }
-                }
-                if (data.isNotEmpty()) {
-                    viewPagerAdapter = ViewPagerAdapter(supportFragmentManager)
-                    noScrollViewPager.adapter = viewPagerAdapter
-                    noScrollViewPager.addOnPageChangeListener(MyPageChangeListener())
-                    noScrollViewPager.offscreenPageLimit = 1
-                    noScrollViewPager.setCurrentItem(1, false)
-                    VideoFileMode.cleanVideoFile(data)
-                }
+                TableMode.saveAdList(Gson().toJson(it))
+                setAdList(it)
+            } else {
+                val adList = Gson().fromJson<List<AdListBean>>(TableMode.getAdList(), object : TypeToken<List<AdListBean>>() {}.type)
+                setAdList(adList)
             }
         }, {
-
+            val adList = Gson().fromJson<List<AdListBean>>(TableMode.getAdList(), object : TypeToken<List<AdListBean>>() {}.type)
+            setAdList(adList)
         })
+    }
+
+    private fun setAdList(it: List<AdListBean>?) {
+        if (it == null) {
+            return
+        }
+        data.clear()
+        for (ad in it) {
+            if (ad.type == 1) {
+                val imageList = ArrayList<String>()
+                if (!TextUtils.isEmpty(ad.image1)) {
+                    imageList.add(ad.image1!!)
+                }
+                if (!TextUtils.isEmpty(ad.image2)) {
+                    imageList.add(ad.image2!!)
+                }
+                if (!TextUtils.isEmpty(ad.image3)) {
+                    imageList.add(ad.image3!!)
+                }
+                for (image in imageList) {
+                    data.add(AdDataBean(image, AD_SHOW_TIME / imageList.size.toLong(), false))
+                }
+            } else {
+                if (!TextUtils.isEmpty(ad.videoUrl)) {
+                    data.add(AdDataBean(ad.videoUrl!!, 0L, true))
+                }
+            }
+        }
+        if (data.isNotEmpty()) {
+            ivHomeBackground.visibility = View.GONE
+            viewPagerAdapter = ViewPagerAdapter(supportFragmentManager)
+            noScrollViewPager.adapter = viewPagerAdapter
+            noScrollViewPager.addOnPageChangeListener(MyPageChangeListener())
+            noScrollViewPager.offscreenPageLimit = 1
+            noScrollViewPager.setCurrentItem(1, false)
+            VideoFileMode.cleanVideoFile(data)
+        }
     }
 
     @SuppressLint("SetTextI18n")
