@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.graphics.drawable.AnimationDrawable
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.os.Handler
@@ -90,6 +91,8 @@ class MainActivity : AppCompatActivity() {
             if (isCalling) return@setOnClickListener
             if (callService()) {
                 ivCallBg.visibility = View.VISIBLE
+                val anim = ivCallBg.drawable as AnimationDrawable
+                anim.start()
                 ivCall.setImageDrawable(applicationContext.resources.getDrawable(R.drawable.call_btn2))
                 object : CountDownTimer(6 * 1000L, 1 * 1000L) {
 
@@ -104,6 +107,7 @@ class MainActivity : AppCompatActivity() {
 
                     override fun onFinish() {
                         isCalling = false
+                        anim.stop()
                         ivCallBg.visibility = View.INVISIBLE
                         tvCall.text = "服务"
                         ivCall.setImageDrawable(applicationContext.resources.getDrawable(R.drawable.call_background))
