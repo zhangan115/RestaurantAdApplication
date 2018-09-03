@@ -32,9 +32,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center"
-                android:text="@string/info_config"
+                android:text="@string/info_config_title"
                 android:textColor="@android:color/white"
-                android:textSize="24sp" />
+                android:textSize="20sp" />
         </LinearLayout>
 
         <LinearLayout
@@ -45,7 +45,7 @@
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="1"
+                android:layout_weight="8"
                 android:orientation="vertical">
 
                 <TextView
@@ -54,7 +54,7 @@
                     android:gravity="center"
                     android:text="@string/choose_restaurant"
                     android:textColor="#333333"
-                    android:textSize="24sp" />
+                    android:textSize="18sp" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -122,8 +122,9 @@
                 android:background="#ececec" />
 
             <LinearLayout
-                android:layout_width="395dp"
+                android:layout_width="0dp"
                 android:layout_height="match_parent"
+                android:layout_weight="5"
                 android:orientation="vertical">
 
                 <TextView
@@ -132,16 +133,17 @@
                     android:gravity="center"
                     android:text="@string/info_config"
                     android:textColor="#333333"
-                    android:textSize="24sp" />
+                    android:textSize="18sp" />
 
                 <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="260dp">
+                    android:layout_height="200dp">
 
                     <android.support.v7.widget.RecyclerView
                         android:id="@+id/recycleView_table_num"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:background="#b7d8fb"
                         android:paddingLeft="10dp"
                         android:paddingRight="10dp"
                         android:scrollbars="none" />
@@ -153,7 +155,7 @@
                         android:layout_centerInParent="true"
                         android:text="@string/no_data_now"
                         android:textColor="#999999"
-                        android:textSize="20sp" />
+                        android:textSize="16sp" />
                 </RelativeLayout>
 
                 <View
@@ -171,7 +173,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:orientation="vertical"
-                        android:paddingLeft="50dp">
+                        android:paddingLeft="20dp">
 
                         <TextView
                             android:layout_width="match_parent"
@@ -202,7 +204,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="42dp"
                             android:layout_marginLeft="10dp"
-                            android:layout_marginRight="60dp"
+                            android:layout_marginRight="20dp"
                             android:background="@drawable/input_background"
                             android:orientation="horizontal">
 
@@ -228,7 +230,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="42dp"
                             android:layout_marginLeft="10dp"
-                            android:layout_marginRight="60dp"
+                            android:layout_marginRight="20dp"
                             android:background="@drawable/input_background"
                             android:orientation="horizontal">
 
@@ -254,7 +256,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:layout_marginLeft="10dp"
-                                android:layout_marginRight="60dp"
+                                android:layout_marginRight="20dp"
                                 android:background="@drawable/btn_login"
                                 android:gravity="center"
                                 android:paddingBottom="10dp"
