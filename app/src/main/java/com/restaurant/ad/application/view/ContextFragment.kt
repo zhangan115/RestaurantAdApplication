@@ -61,6 +61,9 @@ class ContextFragment : Fragment(), VideoFileMode.DownLoadHandle.DownLoadCallBac
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val height = resources.displayMetrics.widthPixels / 16 * 9
+        video_view.layoutParams.height = height
+        image_view.layoutParams.height = height
         if (activity != null) {
             controlHandler = ControlHandler(WeakReference(activity!!))
         }
@@ -77,8 +80,8 @@ class ContextFragment : Fragment(), VideoFileMode.DownLoadHandle.DownLoadCallBac
             GlideApp.with(this).load(url)
                     .placeholder(R.drawable.shape_image_background)
                     .into(image_view)
-            Glide.with(this).load(url)
-                    .apply(RequestOptions.bitmapTransform(GlideBlurTransformation(activity))).into(iv_call_background);
+//            Glide.with(this).load(url)
+//                    .apply(RequestOptions.bitmapTransform(GlideBlurTransformation(activity))).into(iv_call_background)
         }
         lazyLoad()
     }

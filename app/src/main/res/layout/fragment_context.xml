@@ -15,15 +15,15 @@
 
     <VideoView
         android:id="@+id/video_view"
-        android:layout_width="720dp"
+        android:layout_width="match_parent"
         android:layout_gravity="center_horizontal"
-        android:layout_height="405dp"
+        android:layout_height="match_parent"
         android:visibility="gone" />
 
     <ImageView
         android:id="@+id/image_view"
-        android:layout_width="720dp"
-        android:layout_height="405dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_gravity="center_horizontal"
         android:contentDescription="@string/show_picture"
         android:scaleType="centerCrop"
