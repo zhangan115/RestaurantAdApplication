@@ -208,7 +208,9 @@ class RestaurantConfigActivity : AppCompatActivity() {
             return
         } else {
             tableList.clear()
-            tableList.addAll(currentRestaurant!!.tableNums.split(","))
+            if (!TextUtils.isEmpty(currentRestaurant!!.tableNums)) {
+                tableList.addAll(currentRestaurant!!.tableNums.split(","))
+            }
         }
         if (tableList.isEmpty()) {
             tv_table_num.visibility = View.VISIBLE

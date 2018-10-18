@@ -10,6 +10,7 @@ import android.os.Bundle
 import android.os.CountDownTimer
 import android.os.Handler
 import android.os.Message
+import android.support.annotation.NonNull
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentStatePagerAdapter
@@ -29,10 +30,13 @@ import com.iflytek.cloud.SynthesizerListener
 import com.restaurant.ad.application.R
 import com.restaurant.ad.application.mode.*
 import kotlinx.android.synthetic.main.activity_main.*
+import pub.devrel.easypermissions.AfterPermissionGranted
+import pub.devrel.easypermissions.AppSettingsDialog
+import pub.devrel.easypermissions.EasyPermissions
 import java.lang.ref.WeakReference
 
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
 
     private val data = ArrayList<AdDataBean>()
     private val broadcastReceiver = NextBroadcastReceive()
@@ -115,7 +119,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
         setTime()
-        requestAdList()
+        checkPermission()
     }
 
     override fun onResume() {
@@ -322,5 +326,39 @@ class MainActivity : AppCompatActivity() {
         override fun onPageSelected(position: Int) {
             mPosition = position
         }
+    }
+
+
+    @AfterPermissionGranted(Companion.REQUEST_EXTERNAL)
+    fun checkPermission() {
+        if (!EasyPermissions.hasPermissions(this.applicationContext, android.Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+            EasyPermissions.requestPermissions(this, getString(R.string.request_permissions),
+                    Companion.REQUEST_EXTERNAL, android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        } else {
+            requestAdList()
+        }
+    }
+
+    override fun onPermissionsGranted(requestCode: Int, @NonNull perms: List<String>) {
+
+    }
+
+    override fun onPermissionsDenied(requestCode: Int, @NonNull perms: List<String>) {
+        if (requestCode == Companion.REQUEST_EXTERNAL) {
+            if (EasyPermissions.somePermissionPermanentlyDenied(this, perms)) {
+                AppSettingsDialog.Builder(this)
+                        .setRationale(getString(R.string.need_save_setting))
+                        .setTitle(getString(R.string.request_permissions))
+                        .setPositiveButton(getString(R.string.sure))
+                        .setNegativeButton(getString(R.string.cancel))
+                        .setRequestCode(Companion.REQUEST_EXTERNAL)
+                        .build()
+                        .show()
+            }
+        }
+    }
+
+    companion object {
+         const val REQUEST_EXTERNAL = 10 //内存卡权限
     }
 }
