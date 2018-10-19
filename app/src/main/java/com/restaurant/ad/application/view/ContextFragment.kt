@@ -12,6 +12,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.restaurant.ad.application.R
@@ -114,7 +115,8 @@ class ContextFragment : Fragment(), VideoFileMode.DownLoadHandle.DownLoadCallBac
         }
         if (isVideo) {
             video_view.setOnErrorListener { _, _, _ ->
-                controlHandler?.sendEmptyMessage(1)//开始计时
+                Toast.makeText(activity,"视频播放错误，马上跳过",Toast.LENGTH_SHORT).show()
+//                controlHandler?.sendEmptyMessageDelayed(1,5*1000L)//开始计时
                 true
             }
             video_view.setOnPreparedListener {
@@ -127,7 +129,7 @@ class ContextFragment : Fragment(), VideoFileMode.DownLoadHandle.DownLoadCallBac
             }
             video_view.setOnCompletionListener {
                 video_view.stopPlayback()
-                controlHandler?.sendEmptyMessage(1)//开始计时
+//                controlHandler?.sendEmptyMessage(1)//开始计时
             }
             if (videoMode != null) {
                 if (videoMode!!.isDownLoadSuccess()) {
@@ -139,7 +141,7 @@ class ContextFragment : Fragment(), VideoFileMode.DownLoadHandle.DownLoadCallBac
             }
             video_view.start()
         } else {
-            controlHandler?.sendEmptyMessageDelayed(1, imageTime)//开始计时
+//           controlHandler?.sendEmptyMessageDelayed(1, imageTime)//开始计时
         }
     }
 
@@ -175,7 +177,7 @@ class ContextFragment : Fragment(), VideoFileMode.DownLoadHandle.DownLoadCallBac
         override fun handleMessage(msg: Message?) {
             if (msg != null) {
                 Log.d("ZA", "next")
-                activity?.get()?.sendBroadcast(Intent("next"))
+//                activity?.get()?.sendBroadcast(Intent("next"))
             }
         }
     }

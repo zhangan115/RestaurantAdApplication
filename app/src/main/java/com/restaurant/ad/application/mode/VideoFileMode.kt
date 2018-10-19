@@ -69,34 +69,38 @@ open class VideoFileMode(var url: String?) {
         val downLoadHandle = DownLoadHandle(callBack)
         if (!TextUtils.isEmpty(url)) {
             launch {
-                val call = retrofit.create(DownLoadApi::class.java).downloadFile(url!!)
-                if (isDownLoadSuccess()) {
-                    downLoadHandle.sendEmptyMessage(0)
-                } else {
-                    File(savePath).mkdir()
-                    val response = call.execute()
-                    if (response != null && response.isSuccessful) {
-                        var sink: Sink? = null
-                        var bufferedSink: BufferedSink? = null
-                        try {
-                            sink = Okio.sink(File(savePath, getSaveFileName()))
-                            if (sink != null) {
-                                bufferedSink = Okio.buffer(sink)
-                                bufferedSink.writeAll(response.body()!!.source())
-                                bufferedSink.close()
-                            }
-                            Log.i("DOWNLOAD", "download success")
-                            downLoadHandle.sendEmptyMessage(0)
-                        } catch (e: Exception) {
-                            e.printStackTrace()
-                            downLoadHandle.sendEmptyMessage(1)
-                        } finally {
-                            sink?.close()
-                            bufferedSink?.close()
-                        }
+                try {
+                    val call = retrofit.create(DownLoadApi::class.java).downloadFile(url!!)
+                    if (isDownLoadSuccess()) {
+                        downLoadHandle.sendEmptyMessage(0)
                     } else {
-                        downLoadHandle.sendEmptyMessage(1)
+                        File(savePath).mkdir()
+                        val response = call.execute()
+                        if (response != null && response.isSuccessful) {
+                            var sink: Sink? = null
+                            var bufferedSink: BufferedSink? = null
+                            try {
+                                sink = Okio.sink(File(savePath, getSaveFileName()))
+                                if (sink != null) {
+                                    bufferedSink = Okio.buffer(sink)
+                                    bufferedSink.writeAll(response.body()!!.source())
+                                    bufferedSink.close()
+                                }
+                                Log.i("DOWNLOAD", "download success")
+                                downLoadHandle.sendEmptyMessage(0)
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                                downLoadHandle.sendEmptyMessage(1)
+                            } finally {
+                                sink?.close()
+                                bufferedSink?.close()
+                            }
+                        } else {
+                            downLoadHandle.sendEmptyMessage(1)
+                        }
                     }
+                } catch (e: IOException) {
+                    e.printStackTrace()
                 }
             }
         }

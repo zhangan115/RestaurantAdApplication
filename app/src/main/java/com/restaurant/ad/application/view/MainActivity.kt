@@ -40,7 +40,7 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
 
     private val data = ArrayList<AdDataBean>()
     private val broadcastReceiver = NextBroadcastReceive()
-    private var currentPosition: Int = 1
+    private var currentPosition: Int = 0
     private var timeHandler: TimeHandler? = null
 
     private var currentTime = 0L
@@ -61,9 +61,7 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
         mTts = SpeechSynthesizer.createSynthesizer(this) {}
         viewPagerAdapter = ViewPagerAdapter(supportFragmentManager)
         noScrollViewPager.adapter = viewPagerAdapter
-        noScrollViewPager.addOnPageChangeListener(MyPageChangeListener())
         noScrollViewPager.offscreenPageLimit = 1
-        noScrollViewPager.setCurrentItem(1, false)
         val intentFilter = IntentFilter()
         intentFilter.addAction("requestAdList")
         intentFilter.addAction("next")
@@ -196,8 +194,10 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
 
         override fun handleMessage(msg: Message?) {
             super.handleMessage(msg)
-            val intent = Intent("Time")
-            activity?.get()?.sendBroadcast(intent)
+            if (msg?.what == 1 && msg.arg1 == activity?.get()?.currentPosition) {
+                val intent = Intent("next")
+                activity.get()?.sendBroadcast(intent)
+            }
         }
     }
 
@@ -213,17 +213,11 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
     inner class ViewPagerAdapter(fragmentManager: FragmentManager) : FragmentStatePagerAdapter(fragmentManager) {
 
         override fun getItem(position: Int): Fragment {
-            return if (position == 0) {
-                ContextFragment.newInstance(true)
-            } else if (position > 0 && position <= data.size) {
-                ContextFragment.newInstance(data[position - 1].url, data[position - 1].isVideo, data[position - 1].time)
-            } else {
-                ContextFragment.newInstance(true)
-            }
+            return ContextFragment.newInstance(data[position].url, data[position].isVideo, data[position].time)
         }
 
         override fun getCount(): Int {
-            return data.size + 2
+            return data.size
         }
     }
 
@@ -232,9 +226,13 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
         override fun onReceive(contenxt: Context?, intent: Intent?) {
             if (intent != null) {
                 if (TextUtils.equals(intent.action, "next")) {
-                    currentPosition = noScrollViewPager.currentItem
                     ++currentPosition
-                    noScrollViewPager.setCurrentItem(currentPosition, true)
+                    if (currentPosition >= data.size) {
+                        currentPosition = 0
+                        noScrollViewPager.setCurrentItem(0, false)
+                    } else {
+                        noScrollViewPager.setCurrentItem(currentPosition, true)
+                    }
                 } else if (TextUtils.equals(intent.action, "requestAdList")) {
                     requestAdList()
                 }
@@ -284,7 +282,11 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
                 }
             } else {
                 if (!TextUtils.isEmpty(ad.videoUrl)) {
-                    data.add(AdDataBean(ad.videoUrl!!, 0L, true))
+                    if (!TextUtils.isEmpty(ad.duration)) {
+                        data.add(AdDataBean(ad.videoUrl!!, ad.duration!!.toLong()*1000L, true))
+                    } else {
+                        data.add(AdDataBean(ad.videoUrl!!, 10L*1000L, true))
+                    }
                 }
             }
         }
@@ -294,8 +296,8 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
             noScrollViewPager.adapter = viewPagerAdapter
             noScrollViewPager.addOnPageChangeListener(MyPageChangeListener())
             noScrollViewPager.offscreenPageLimit = 1
-            noScrollViewPager.setCurrentItem(1, false)
             VideoFileMode.cleanVideoFile(data)
+            startTime(data[0].time, 0)
         }
     }
 
@@ -307,16 +309,11 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
         tvTimeYear.format24Hour = "yyyy年MM月dd日EEEE"
     }
 
+
     private inner class MyPageChangeListener : ViewPager.OnPageChangeListener {
-        private var mPosition: Int = 0
+
         override fun onPageScrollStateChanged(state: Int) {
-            if (state == ViewPager.SCROLL_STATE_IDLE) {
-                if (mPosition == noScrollViewPager.adapter!!.count - 1) {
-                    noScrollViewPager.setCurrentItem(1, false)
-                } else if (mPosition == 0) {
-                    noScrollViewPager.setCurrentItem(noScrollViewPager.adapter!!.count - 2, false)
-                }
-            }
+
         }
 
         override fun onPageScrolled(p0: Int, p1: Float, p2: Int) {
@@ -324,7 +321,23 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
         }
 
         override fun onPageSelected(position: Int) {
-            mPosition = position
+            startTime(data[position].time, position)
+        }
+    }
+
+    fun startTime(time: Long, position: Int) {
+        fullScreen()
+        currentPosition = position
+        if (!data[position].isVideo) {
+            val message = Message.obtain()
+            message.arg1 = position
+            message.what = 1
+            timeHandler?.sendMessageDelayed(message, time)
+        } else {
+            val message = Message.obtain()
+            message.arg1 = position
+            message.what = 1
+            timeHandler?.sendMessageDelayed(message, time)
         }
     }
 
@@ -359,6 +372,6 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
     }
 
     companion object {
-         const val REQUEST_EXTERNAL = 10 //内存卡权限
+        const val REQUEST_EXTERNAL = 10 //内存卡权限
     }
 }

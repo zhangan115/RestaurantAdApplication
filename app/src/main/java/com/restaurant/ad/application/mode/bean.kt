@@ -11,7 +11,7 @@ data class Restaurant(var createTime: Long, var endTime: Long, var latitude: Flo
 
 
 data class AdListBean(var advertisingId: Long, var image1: String?, var image2: String?, var image3: String?
-                      , var type: Int, var videoUrl: String?, var servingPlace: String)
+                      , var type: Int, var videoUrl: String?, var servingPlace: String?,var duration:String?)
 
 data class AdDataBean(var url: String, var time: Long, var isVideo: Boolean)
 
