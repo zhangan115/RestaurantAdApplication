@@ -283,7 +283,13 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
             } else {
                 if (!TextUtils.isEmpty(ad.videoUrl)) {
                     if (!TextUtils.isEmpty(ad.duration)) {
-                        data.add(AdDataBean(ad.videoUrl!!, ad.duration!!.toLong()*1000L, true))
+                        var time = 30*1000L
+                        try {
+                            time= (ad.duration!!.toDouble()*1000L).toLong()
+                        }catch (e:Exception){
+                            e.printStackTrace()
+                        }
+                        data.add(AdDataBean(ad.videoUrl!!, time, true))
                     } else {
                         data.add(AdDataBean(ad.videoUrl!!, 10L*1000L, true))
                     }
