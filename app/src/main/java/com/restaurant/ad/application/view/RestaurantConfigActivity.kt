@@ -62,6 +62,10 @@ class RestaurantConfigActivity : AppCompatActivity() {
             }
 
         })
+        if(!TextUtils.isEmpty(TableMode.getDeviceNum())){
+            editDeviceNum.isEnabled = false
+            editDeviceNum.setText(TableMode.getDeviceNum())
+        }
         recycleView_restaurant.adapter = adapter
         btnFilter.setOnClickListener {
             drawer_layout.openDrawer(GravityCompat.START)
