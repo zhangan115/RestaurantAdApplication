@@ -9,13 +9,10 @@ import com.restaurant.ad.application.mode.VideoFileMode.DownLoadHandle.DownLoadC
 import kotlinx.coroutines.experimental.launch
 import okhttp3.OkHttpClient
 import okhttp3.ResponseBody
-import okhttp3.logging.HttpLoggingInterceptor
 import okio.BufferedSink
 import okio.Okio
 import okio.Sink
 import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.protobuf.ProtoConverterFactory
