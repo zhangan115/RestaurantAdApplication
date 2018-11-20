@@ -208,12 +208,11 @@
                             android:background="@drawable/input_background"
                             android:orientation="horizontal">
 
-                            <EditText
+                            <TextView
                                 android:id="@+id/editDeviceNum"
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
                                 android:background="@null"
-                                android:inputType="text"
                                 android:textColor="#999999"
                                 android:textSize="20sp" />
                         </LinearLayout>

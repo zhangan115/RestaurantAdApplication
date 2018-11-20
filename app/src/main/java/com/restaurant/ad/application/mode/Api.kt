@@ -49,4 +49,10 @@ interface Api {
     @GET("api/restaurant/insertCallLog.json")
     fun insertCallLog(@QueryMap() requestMap: Map<String, String>): Call<BaseEntity<String>>
 
+    /**
+     * 9,获取设备列表
+     */
+    @GET("api/pad/getNoSetTableNumPadList.json")
+    fun getDeviceList(): Call<BaseEntity<List<Device>>>
+
 }

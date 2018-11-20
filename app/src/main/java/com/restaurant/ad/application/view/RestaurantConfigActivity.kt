@@ -1,5 +1,6 @@
 package com.restaurant.ad.application.view
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.support.v4.view.GravityCompat
@@ -62,9 +63,14 @@ class RestaurantConfigActivity : AppCompatActivity() {
             }
 
         })
-        if(!TextUtils.isEmpty(TableMode.getDeviceNum())){
+        if (!TextUtils.isEmpty(TableMode.getDeviceNum())) {
             editDeviceNum.isEnabled = false
-            editDeviceNum.setText(TableMode.getDeviceNum())
+            editDeviceNum.text = TableMode.getDeviceNum()
+        } else {
+            editDeviceNum.setOnClickListener {
+                val intent = Intent(this, ChooseDeviceActivity::class.java)
+                startActivityForResult(intent, 200)
+            }
         }
         recycleView_restaurant.adapter = adapter
         btnFilter.setOnClickListener {
@@ -84,6 +90,14 @@ class RestaurantConfigActivity : AppCompatActivity() {
         val tableAdapter = TableAdapter(tableList, this)
         recycleView_table_num.layoutManager = GridLayoutManager(this, 5)
         recycleView_table_num.adapter = tableAdapter
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == Activity.RESULT_OK && requestCode == 200 && data != null) {
+            val padNum = data.getStringExtra("padNum")
+            editDeviceNum.text = padNum
+        }
     }
 
     private fun bindDeviceTable(deviceNum: String?, tableNum: String?) {
