@@ -28,24 +28,28 @@ class ChooseDeviceActivity : AppCompatActivity() {
         window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)// 设置全屏
         setContentView(R.layout.activity_choose_device)
         manager = OkHttpManager(lifecycle)
-        manager.requestData(manager.retrofit.create(Api::class.java).getDeviceList(),{
-            if (it!=null){
+        manager.requestData(manager.retrofit.create(Api::class.java).getDeviceList(), {
+            if (it != null) {
                 this.data.clear()
                 this.data.addAll(it)
             }
             recycleViewDevice.adapter?.notifyDataSetChanged()
-        },{
-            Toast.makeText(this,it,Toast.LENGTH_SHORT).show()
+        }, {
+            Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
         })
         recycleViewDevice.layoutManager = LinearLayoutManager(this)
-        recycleViewDevice.adapter = Adapter(data,this)
+        recycleViewDevice.adapter = Adapter(data, this)
+        back_btn.setOnClickListener {
+            finish()
+        }
     }
-    private class Adapter(private val dataList: ArrayList<Device>,private val content: Context)
+
+    private class Adapter(private val dataList: ArrayList<Device>, private val content: Context)
         : RecyclerView.Adapter<ViewHolder>() {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
             val view = LayoutInflater.from(content).inflate(R.layout.item_choose_device, parent, false)
             val text = view.findViewById<TextView>(R.id.deviceName)
-            return ViewHolder(view,text )
+            return ViewHolder(view, text)
         }
 
         override fun getItemCount(): Int {
@@ -55,10 +59,10 @@ class ChooseDeviceActivity : AppCompatActivity() {
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             holder.text.text = dataList[position].padNum
             holder.itemView.setOnClickListener {
-                if (content is ChooseDeviceActivity){
+                if (content is ChooseDeviceActivity) {
                     val intent = Intent()
-                    intent.putExtra("padNum",dataList[position].padNum)
-                    content.setResult(Activity.RESULT_OK,intent)
+                    intent.putExtra("padNum", dataList[position].padNum)
+                    content.setResult(Activity.RESULT_OK, intent)
                     content.finish()
                 }
             }

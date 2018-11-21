@@ -11,6 +11,7 @@
         android:layout_height="match_parent"
         android:contentDescription="@string/image_des_call_background"
         android:scaleType="centerCrop"
+        android:visibility="visible"
         android:src="@drawable/app_home_bg" />
 
     <VideoView

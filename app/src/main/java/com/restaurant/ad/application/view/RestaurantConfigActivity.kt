@@ -64,13 +64,15 @@ class RestaurantConfigActivity : AppCompatActivity() {
 
         })
         if (!TextUtils.isEmpty(TableMode.getDeviceNum())) {
-            editDeviceNum.isEnabled = false
             editDeviceNum.text = TableMode.getDeviceNum()
         } else {
             editDeviceNum.setOnClickListener {
                 val intent = Intent(this, ChooseDeviceActivity::class.java)
                 startActivityForResult(intent, 200)
             }
+        }
+        if (!TextUtils.isEmpty(TableMode.getTableNum())) {
+            editTableNum.setText(TableMode.getTableNum())
         }
         recycleView_restaurant.adapter = adapter
         btnFilter.setOnClickListener {
@@ -206,12 +208,13 @@ class RestaurantConfigActivity : AppCompatActivity() {
         searchManager.requestData(searchManager.retrofit.create(Api::class.java).restaurantList(requestMap), {
             if (it != null && it.isNotEmpty()) {
                 restaurantList.addAll(it)
+                noRestaurant.visibility = View.GONE
                 recycleView_restaurant.adapter?.notifyDataSetChanged()
             } else {
-
+                noRestaurant.visibility = View.VISIBLE
             }
         }, {
-
+            noRestaurant.visibility = View.VISIBLE
         })
     }
 
