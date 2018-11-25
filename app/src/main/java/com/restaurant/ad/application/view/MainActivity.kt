@@ -231,7 +231,7 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
                         currentPosition = 0
                         noScrollViewPager.setCurrentItem(0, false)
                     } else {
-                        noScrollViewPager.setCurrentItem(currentPosition, true)
+                        noScrollViewPager.setCurrentItem(currentPosition, false)
                     }
                 } else if (TextUtils.equals(intent.action, "requestAdList")) {
                     requestAdList()

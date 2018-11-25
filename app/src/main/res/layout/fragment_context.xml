@@ -16,15 +16,17 @@
 
     <VideoView
         android:id="@+id/video_view"
-        android:layout_width="match_parent"
+        android:layout_width="768dp"
         android:layout_gravity="center_horizontal"
-        android:layout_height="match_parent"
+        android:layout_marginBottom="0dp"
+        android:layout_height="914dp"
         android:visibility="gone" />
 
     <ImageView
         android:id="@+id/image_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="768dp"
+        android:layout_height="914dp"
+        android:layout_marginBottom="0dp"
         android:layout_gravity="center_horizontal"
         android:contentDescription="@string/show_picture"
         android:scaleType="centerCrop"

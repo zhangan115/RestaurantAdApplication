@@ -11,7 +11,6 @@ import android.view.*
 import android.widget.TextView
 import android.widget.Toast
 import com.restaurant.ad.application.R
-import com.restaurant.ad.application.mode.AdListBean
 import com.restaurant.ad.application.mode.Api
 import com.restaurant.ad.application.mode.Device
 import com.restaurant.ad.application.mode.OkHttpManager

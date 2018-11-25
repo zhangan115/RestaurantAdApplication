@@ -62,9 +62,9 @@ class ContextFragment : Fragment(), VideoFileMode.DownLoadHandle.DownLoadCallBac
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val height = resources.displayMetrics.widthPixels / 16 * 9
-        video_view.layoutParams.height = height
-        image_view.layoutParams.height = height
+//        val height = resources.displayMetrics.widthPixels / 16 * 9
+//        video_view.layoutParams.height = height
+//        image_view.layoutParams.height = height
         if (activity != null) {
             controlHandler = ControlHandler(WeakReference(activity!!))
         }
