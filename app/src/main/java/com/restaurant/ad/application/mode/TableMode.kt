@@ -39,5 +39,22 @@ object TableMode {
 
     fun saveAdList(adList: String) {
         App.instance.getSharedPreferences(ConstantStr.SP_DIR, Context.MODE_PRIVATE).edit().putString(ConstantStr.SP_AD_LIST, adList).apply()
+
+    }
+
+    fun saveResName(name:String){
+        App.instance.getSharedPreferences(ConstantStr.SP_DIR, Context.MODE_PRIVATE).edit().putString(ConstantStr.SP_RESTAURANT_NAME, name).apply()
+    }
+
+    fun getResName():String?{
+        return App.instance.getSharedPreferences(ConstantStr.SP_DIR, Context.MODE_PRIVATE).getString(ConstantStr.SP_RESTAURANT_NAME, "")
+    }
+
+    fun saveResId(id:String){
+        App.instance.getSharedPreferences(ConstantStr.SP_DIR, Context.MODE_PRIVATE).edit().putString(ConstantStr.SP_RESTAURANT_ID, id).apply()
+    }
+
+    fun getResID():String?{
+        return App.instance.getSharedPreferences(ConstantStr.SP_DIR, Context.MODE_PRIVATE).getString(ConstantStr.SP_RESTAURANT_ID, "")
     }
 }

@@ -66,7 +66,6 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
         intentFilter.addAction("requestAdList")
         intentFilter.addAction("next")
         registerReceiver(broadcastReceiver, intentFilter)
-
         llTime.setOnClickListener {
             if (currentTime == 0L) {
                 currentTime = System.currentTimeMillis()

@@ -92,6 +92,10 @@ class RestaurantConfigActivity : AppCompatActivity() {
         val tableAdapter = TableAdapter(tableList, this)
         recycleView_table_num.layoutManager = GridLayoutManager(this, 5)
         recycleView_table_num.adapter = tableAdapter
+        val resName = TableMode.getResName()
+        if (!TextUtils.isEmpty(resName)) {
+            res_name.text = resName!!
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -103,22 +107,30 @@ class RestaurantConfigActivity : AppCompatActivity() {
     }
 
     private fun bindDeviceTable(deviceNum: String?, tableNum: String?) {
+        val requestMap = HashMap<String, String>()
         if (TextUtils.isEmpty(deviceNum) || TextUtils.isEmpty(tableNum)) {
             Toast.makeText(this, "请输入设备编号和桌号", Toast.LENGTH_SHORT).show()
             return
         }
+        val resId = TableMode.getResID()
         if (currentRestaurant == null) {
-            Toast.makeText(this, "请选择餐厅", Toast.LENGTH_SHORT).show()
-            return
+            if (TextUtils.isEmpty(resId)) {
+                Toast.makeText(this, "请选择餐厅", Toast.LENGTH_SHORT).show()
+                return
+            } else {
+                requestMap["restaurantId"] = resId!!
+            }
+        } else {
+            requestMap["restaurantId"] = currentRestaurant!!.restaurantId.toString()
         }
-        val requestMap = HashMap<String, String>()
         requestMap["padNum"] = deviceNum!!
         requestMap["tableNum"] = tableNum!!
-        requestMap["restaurantId"] = currentRestaurant!!.restaurantId.toString()
         val binManager = OkHttpManager<String>(lifecycle)
         binManager.requestData(binManager.retrofit.create(Api::class.java).tableNumSetting(requestMap), {
             TableMode.saveDeviceNum(deviceNum)
             TableMode.saveTableNum(tableNum)
+            TableMode.saveResId( requestMap["restaurantId"]!!)
+            TableMode.saveResName(res_name.text.toString())
             TableMode.saveRestaurantNum(currentRestaurant?.restaurantId.toString())
             Toast.makeText(this, "绑定成功", Toast.LENGTH_SHORT).show()
             sendBroadcast(Intent("requestAdList"))
