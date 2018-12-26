@@ -172,15 +172,20 @@ class RestaurantConfigActivity : AppCompatActivity() {
                     }
                     nodeList.add(node1)
                 }
+//                searchRes()
                 val mAdapter = SimpleTreeRecyclerAdapter(cityRecyclerView, this,
                         nodeList, 0, R.drawable.navigation_icon_top, R.drawable.navigation_icon_down)
                 cityRecyclerView.adapter = mAdapter
                 mAdapter.setOnTreeNodeClickListener { node, position ->
-                    if (node.isLeaf) {
+                    if (node.level==1&&node.isExpand){
                         currentNode = node as Node<String, City>?
-                        if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
-                            drawer_layout.closeDrawer(GravityCompat.START)
+                        for (n in nodeList) {
+                            n.isChecked = TextUtils.equals(n.id, currentNode?.id)
                         }
+                        mAdapter.notifyDataSetChanged()
+                        searchRes()
+                    }else if (node.isLeaf ){
+                        currentNode = node as Node<String, City>?
                         for (n in nodeList) {
                             n.isChecked = TextUtils.equals(n.id, currentNode?.id)
                         }
