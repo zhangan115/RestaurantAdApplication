@@ -4,7 +4,6 @@ import android.app.Application
 import com.iflytek.cloud.SpeechConstant
 import com.iflytek.cloud.SpeechUtility
 import com.tencent.bugly.Bugly
-import com.tencent.bugly.crashreport.CrashReport
 
 class App : Application() {
 
