@@ -239,7 +239,10 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
         }
     }
 
+    @AfterPermissionGranted(REQUEST_EXTERNAL)
     private fun requestAdList() {
+        Log.e("za","here")
+        return
         val manager = OkHttpManager<List<AdListBean>>(lifecycle)
         val padNum = TableMode.getDeviceNum()
         if (TextUtils.isEmpty(padNum)) return
@@ -346,12 +349,10 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
         }
     }
 
-
-    @AfterPermissionGranted(Companion.REQUEST_EXTERNAL)
-    fun checkPermission() {
+   private fun checkPermission() {
         if (!EasyPermissions.hasPermissions(this.applicationContext, android.Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
             EasyPermissions.requestPermissions(this, getString(R.string.request_permissions),
-                    Companion.REQUEST_EXTERNAL, android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    REQUEST_EXTERNAL, android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
         } else {
             requestAdList()
         }
@@ -362,18 +363,23 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
     }
 
     override fun onPermissionsDenied(requestCode: Int, @NonNull perms: List<String>) {
-        if (requestCode == Companion.REQUEST_EXTERNAL) {
+        if (requestCode == REQUEST_EXTERNAL) {
             if (EasyPermissions.somePermissionPermanentlyDenied(this, perms)) {
                 AppSettingsDialog.Builder(this)
                         .setRationale(getString(R.string.need_save_setting))
                         .setTitle(getString(R.string.request_permissions))
                         .setPositiveButton(getString(R.string.sure))
                         .setNegativeButton(getString(R.string.cancel))
-                        .setRequestCode(Companion.REQUEST_EXTERNAL)
+                        .setRequestCode(REQUEST_EXTERNAL)
                         .build()
                         .show()
             }
         }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        EasyPermissions.onRequestPermissionsResult(requestCode,permissions,grantResults,this)
     }
 
     companion object {
